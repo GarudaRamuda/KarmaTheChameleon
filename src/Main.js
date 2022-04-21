@@ -13,7 +13,7 @@ let config = {
         },
         matter: {
             gravity: {
-                y: 4
+                y: 2.8
             },
             debug: true,
         }

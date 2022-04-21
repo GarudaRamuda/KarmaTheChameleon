@@ -1,3 +1,6 @@
+// Adapted from code by Michael Hadley
+// https://medium.com/itnext/modular-game-worlds-in-phaser-3-tilemaps-5-matter-physics-platformer-d14d1f614557
+
 class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, world, x, y, texture, frame, options) {
         super (world, 0, 0, texture, frame, options);
@@ -13,9 +16,14 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
 
         const mainBody = Bodies.rectangle(0, 0, w * 0.6, h * 0.4, { chamfer: { radius: 10 } });
-        let sensor = Bodies.rectangle(0, h * 0.2, w * 0.25, 2, { isSensor: true });
+        this.sensors = {
+            bottom: Bodies.rectangle(0, h * 0.5 * 0.4, w * 0.25, 2, { isSensor: true }),
+            left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.5, { isSensor: true }),
+            right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.5, { isSensor: true })
+        };
+
         const compoundBody = Body.create({
-            parts: [mainBody, sensor],
+            parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right],
             frictionStatic: 0,
             frictionAir: 0.02,
             friction: 0.3,
