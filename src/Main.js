@@ -22,5 +22,5 @@ let config = {
 };
 
 let game = new Phaser.Game(config);
-let pointer, keyLEFT, keyRIGHT;
+let pointer, keyA, keyD, keySPACE;
 game.maxHeight = 0;

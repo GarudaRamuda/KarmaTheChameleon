@@ -12,11 +12,14 @@ class Play extends Phaser.Scene {
     create() {
         this.matter.world.setBounds();
         this.p1 = new Player(this, this.matter.world, 220, 180, 'chameleon'); // do we need setOrigin?
-        this.p1Temp = this.matter.add.sprite(200, 200, 'chameleon');
 
+        keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W); // fix later
+        this.matter.add.mouseSpring();
     }
 
     update() {
-
+        this.p1.update();
     }
 }
