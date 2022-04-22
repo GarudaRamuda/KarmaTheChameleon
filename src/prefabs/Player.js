@@ -1,6 +1,8 @@
 // Adapted from code by Michael Hadley
 // https://medium.com/itnext/modular-game-worlds-in-phaser-3-tilemaps-5-matter-physics-platformer-d14d1f614557
 
+// TODO: Fix the math in onSensorCollide() so that the player's collision is nudged slightly out of range when its left/right sensors collide with something.
+// Probably need to tweak the initialization of L/R sensors in create() as well.
 class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, world, x, y, texture, frame, options) {
         super (world, 0, 0, texture, frame, options);
@@ -19,6 +21,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
 
+        // Let player jump even if they press too early before landing
+        this.bufferWindow = 12;
+        this.jumpBuffer = this.bufferWindow;
+
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
         const { width: w, height: h } = this;
 
@@ -26,6 +32,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         const mainBody = Bodies.rectangle(0, 0, w * 0.6, h * 0.4, { chamfer: { radius: 10 } });
 
         // Create sensors for left, right, bottom
+        // (x, y, w, h, options)
         this.sensors = {
             bottom: Bodies.rectangle(0, h * 0.25, w * 0.15, 2, { isSensor: true }),
             left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.25, { isSensor: true }),
@@ -57,6 +64,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     update() {
+        if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
+
         const velocity = this.body.velocity;
         if (this.isTouching.bottom) {
             this.lastGrounded = this.coyoteTime;
@@ -64,7 +73,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         else {
             this.lastGrounded -= 1;
         }
-        let isGrounded = (this.lastGrounded == this.coyoteTime);
+        // let isGrounded = (this.lastGrounded == this.coyoteTime); use this if we need different movement when airborne
 
         if(keyA.isDown) {
             this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
@@ -74,9 +83,12 @@ class Player extends Phaser.Physics.Matter.Sprite {
             this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
             if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
         }
-        if(Phaser.Input.Keyboard.JustDown(keyW) && this.lastGrounded > 0) {
+        if(Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0 && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
             this.lastGrounded = 0;
+        }
+        else {
+            this.jumpBuffer = this.bufferWindow;
         }
         
     }
