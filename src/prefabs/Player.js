@@ -11,12 +11,13 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // Set up player movement params
         this.groundForce = 0.045;
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
-        this.airForce = .2;
+        this.grappleForce = .0005;
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
         this.jumpHeight = 6.25;
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
+        this.isGrappled = false;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
@@ -39,14 +40,16 @@ class Player extends Phaser.Physics.Matter.Sprite {
             right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.25, { isSensor: true })
         };
     
-        // Assemble the compound body and properties
+        // Assemble the compound body and physics properties
         const compoundBody = Body.create({
             parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right],
             frictionStatic: 0,
             frictionAir: 0,
             friction: 0.3,
             mass: 4,
+            gravityScale: {x: 0.75, y: 0.75},
             render: { sprite: { xOffset: 0.5, yOffset: 0.5} },
+            ignorePointer: true,
         })
         this.setExistingBody(compoundBody)
 
@@ -76,12 +79,27 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // let isGrounded = (this.lastGrounded == this.coyoteTime); use this if we need different movement when airborne
 
         if(keyA.isDown) {
-            this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
-            if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
+            if (!this.flipX) this.flipX = true;
+            if (this.isGrappled) { 
+                this.applyForce({x: -this.grappleForce, y:0});
+            }
+            else this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
+            if (!this.isGrappled) {
+                if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
+            }
         }
         if(keyD.isDown) {
-            this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
-            if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
+            if (this.flipX) this.flipX = false;
+            // Apply smaller force on a grapple
+            if (this.isGrappled){
+                this.applyForce({x: this.grappleForce, y:0});
+            }
+            else this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
+
+            // Cap speed when not grappling
+            if (!this.isGrappled) {
+                if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
+            }
         }
         if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
