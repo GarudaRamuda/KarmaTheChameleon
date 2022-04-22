@@ -13,7 +13,12 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
         this.airForce = .2;
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
-        this.jumpHeight = 6.25;
+        this.jumpHeight = 7;
+        
+        //Apex Floating Variables
+        this.maxUpwardForce = 0.003;
+        this.startingVelocity = 10000;
+        this.terminatingVelocity = 0;
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
@@ -46,6 +51,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             frictionAir: 0,
             friction: 0.3,
             mass: 4,
+            gravityScale: {x: 0, y: 1},
             render: { sprite: { xOffset: 0.5, yOffset: 0.5} },
         })
         this.setExistingBody(compoundBody)
@@ -75,6 +81,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }
         // let isGrounded = (this.lastGrounded == this.coyoteTime); use this if we need different movement when airborne
 
+        if(this.body.velocity.y > -this.startingVelocity && this.body.velocity.y < this.terminatingVelocity && keyW.isDown) {
+            this.applyForce({x:0, y:-this.maxUpwardForce});
+        }   
+
         if(keyA.isDown) {
             this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
             if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
@@ -90,7 +100,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         else if (Phaser.Input.Keyboard.JustDown(keyW)) {
             this.jumpBuffer = this.bufferWindow;
         }
-        
     }
 
     onSensorCollide(event) {
