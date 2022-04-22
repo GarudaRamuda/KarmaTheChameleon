@@ -22,8 +22,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.lastGrounded = this.coyoteTime;
 
         // Let player jump even if they press too early before landing
-        this.bufferWindow = 12;
-        this.jumpBuffer = this.bufferWindow;
+        this.bufferWindow = 16;
+        this.jumpBuffer = 0;
 
         const { Body, Bodies } = Phaser.Physics.Matter.Matter;
         const { width: w, height: h } = this;
@@ -83,11 +83,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
             this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
             if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
         }
-        if(Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0 && this.lastGrounded > 0) {
+        if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
             this.lastGrounded = 0;
         }
-        else {
+        else if (Phaser.Input.Keyboard.JustDown(keyW)) {
             this.jumpBuffer = this.bufferWindow;
         }
         
