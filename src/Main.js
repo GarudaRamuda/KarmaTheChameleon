@@ -4,16 +4,9 @@ let config = {
     height:480,
     physics: {
         default: 'matter',
-        arcade: {
-            gravity: {
-                y: 300
-            },
-            debug: true,
-            debugBodyColor: 0xffffff
-        },
         matter: {
             gravity: {
-                y: 2.8
+                y: 1.5
             },
             debug: true,
         }
@@ -22,5 +15,5 @@ let config = {
 };
 
 let game = new Phaser.Game(config);
-let pointer, keyA, keyD, keySPACE;
+let pointer, keyA, keyD, keyW;
 game.maxHeight = 0;
