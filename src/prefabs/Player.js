@@ -51,7 +51,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
             frictionAir: 0,
             friction: 0.3,
             mass: 4,
-            gravityScale: {x: 0, y: 1},
             render: { sprite: { xOffset: 0.5, yOffset: 0.5} },
         })
         this.setExistingBody(compoundBody)
