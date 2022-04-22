@@ -11,6 +11,10 @@ let config = {
             debug: true,
         }
     },
+    fps: {
+        target: 60,
+        forceSetTimeOut: true
+      },
     scene: [Play]
 };
 
