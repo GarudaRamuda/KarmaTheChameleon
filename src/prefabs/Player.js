@@ -87,22 +87,24 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             // Generate an array of segments to form our rope
                             for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
                                 let seg = this.scene.matter.add.image(0, 0, 'seg', null, {shape: 'circle', mass:0.1});
-                                
+
                                 // First segment binds to a point in the world
                                 if (i == 0) {
                                     this.scene.p1.grappleArray = [];
-                                    this.scene.p1.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.001, {damping: .8, pointA: {x: this.x, y: this.y}}))
+                                    // worldConstraint(body, length, stiffness, {options})
+                                    this.scene.p1.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.4, {damping: .8, pointA: {x: this.x, y: this.y}}))
                                 }
                                 // Otherwise attach to the previous segment
                                 else
                                 {
-                                    this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.001, {damping: .8}));
+                                    // joint(bodyA, bodyB, length, stiffness, {options})
+                                    this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.4, {damping: .8}));
                                 }
                                 prev = seg;
 
                                 // Attach the player to the very last segment the loop makes
                                 if (i == Math.floor(ropeLength / ropeStep) - 1) {
-                                    this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.001, {damping: .8}));
+                                    this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.4, {damping: .8}));
                                 }
                             }
                             this.scene.p1.isGrappled = true;
