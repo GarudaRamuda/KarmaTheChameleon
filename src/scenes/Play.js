@@ -19,7 +19,7 @@ class Play extends Phaser.Scene {
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W); // fix later
         this.matter.add.mouseSpring();
         this.p1.isGrappled = true;
-        this.matter.add.worldConstraint(this.p1, 100, 1, {pointA: {x:320, y:200}});
+        this.matter.add.worldConstraint(this.p1, 100, 1, {pointA: {x:320, y:200},});
     }
 
     update() {
