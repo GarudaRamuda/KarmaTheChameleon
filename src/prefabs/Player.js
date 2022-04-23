@@ -18,9 +18,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
         this.radius = scene.add.sprite(0, 0, 'radius');
-        this.radiusShape = new Phaser.Geom.Circle(this.radius.width/2, this.radius.height/2, this.radius.width/2);
-        this.radius.setInteractive(this.radiusShape, Phaser.Geom.Circle.Contains);
+
+        this.grappleRange = this.radius.width / 2;
         this.isGrappled = false;
+        this.grapple = null;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
@@ -69,21 +70,25 @@ class Player extends Phaser.Physics.Matter.Sprite {
         world.on('collisionactive', this.onSensorCollide, this);
 
         scene.input.on('pointerdown', function (pointer, currentlyOver) {
-            console.log('click!');
-
-            const x = pointer.worldX;
-            const y = pointer.worldY;
-            if (!this.isGrappled) {
-                console.log(currentlyOver.length);
+            if (!this.scene.p1.isGrappled) {
                 for (let i = 0; i < currentlyOver.length; i++) {
-                    console.log((currentlyOver[i]).body.label);
+                    if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
+                        let ropeLength = Phaser.Math.Distance.BetweenPoints(this, this.scene.p1);
+                        if (ropeLength <= this.scene.p1.grappleRange) {
+                            this.scene.p1.grapple = this.scene.matter.add.worldConstraint(this.scene.p1, ropeLength, 0.1, {pointA: {x: this.x, y: this.y}});
+                            this.scene.p1.isGrappled = true;
+                        }
+                    }
                 }
             }
-        })
+        });
 
-        this.radius.on('pointerdown', function () {
-            console.log("click in circle");
-            
+        scene.input.on('pointerup', function () {
+            console.log('unclick!');
+            if (this.scene.p1.isGrappled) {
+                this.scene.matter.world.removeConstraint(this.scene.p1.grapple);
+                this.scene.p1.isGrappled = false;
+            }
         })
 
     }
@@ -175,6 +180,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
     }
+
+
 
     resetTouching() {
         this.isTouching.left = false;
