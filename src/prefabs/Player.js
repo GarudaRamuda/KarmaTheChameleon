@@ -77,7 +77,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     // Check that the clicked body is considered grapplable
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
                         // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
-                        let ropeLength = Phaser.Math.Distance.BetweenPoints(this, this.scene.p1) / 1.5;
+                        let ropeLength = Phaser.Math.Distance.BetweenPoints(this, this.scene.p1) / 1.75;
                         // adjust ropeStep to create more rope segments
                         let ropeStep = Math.floor(ropeLength/4);
                         if (ropeLength <= this.scene.p1.grappleRange) {
