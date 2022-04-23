@@ -17,6 +17,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
+        this.radius = scene.add.sprite(0, 0, 'radius');
+        this.radiusShape = new Phaser.Geom.Circle(this.radius.width/2, this.radius.height/2, this.radius.width/2);
+        this.radius.setInteractive(this.radiusShape, Phaser.Geom.Circle.Contains);
         this.isGrappled = false;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
@@ -64,9 +67,31 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // call onSensorCollide
         world.on('collisionstart', this.onSensorCollide, this);
         world.on('collisionactive', this.onSensorCollide, this);
+
+        scene.input.on('pointerdown', function (pointer, currentlyOver) {
+            console.log('click!');
+
+            const x = pointer.worldX;
+            const y = pointer.worldY;
+            if (!this.isGrappled) {
+                console.log(currentlyOver.length);
+                for (let i = 0; i < currentlyOver.length; i++) {
+                    console.log((currentlyOver[i]).body.label);
+                }
+            }
+        })
+
+        this.radius.on('pointerdown', function () {
+            console.log("click in circle");
+            
+        })
+
     }
 
     update() {
+        this.radius.x = this.x;
+        this.radius.y = this.y;
+
         if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
 
         const velocity = this.body.velocity;
@@ -135,7 +160,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     otherBody = bodyA;
                     playerBody = bodyB;
                 }
-
                 if (otherBody.isSensor) return; // don't need collisions with nonphysical objects
                 if (playerBody === this.sensors.left) {
                     this.isTouching.left = true;

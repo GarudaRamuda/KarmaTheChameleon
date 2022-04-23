@@ -11,7 +11,8 @@ let config = {
             debug: true,
         }
     },
-    scene: [Play]
+    scene: [Play],
+    pixelArt: true,
 };
 
 let game = new Phaser.Game(config);
