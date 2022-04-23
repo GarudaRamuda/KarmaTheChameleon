@@ -70,27 +70,37 @@ class Player extends Phaser.Physics.Matter.Sprite {
         world.on('collisionstart', this.onSensorCollide, this);
         world.on('collisionactive', this.onSensorCollide, this);
 
+        // Grapple logic
         scene.input.on('pointerdown', function (pointer, currentlyOver) {
             if (!this.scene.p1.isGrappled) {
                 for (let i = 0; i < currentlyOver.length; i++) {
+                    // Check that the clicked body is considered grapplable
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
+                        // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
                         let ropeLength = Phaser.Math.Distance.BetweenPoints(this, this.scene.p1) / 1.5;
                         // adjust ropeStep to create more rope segments
                         let ropeStep = Math.floor(ropeLength/4);
                         if (ropeLength <= this.scene.p1.grappleRange) {
                             // this.scene.p1.grapple = this.scene.matter.add.worldConstraint(this.scene.p1, ropeLength/1.5, 0.001, {damping: .8,pointA: {x: this.x, y: this.y}});
                             let prev;
+
+                            // Generate an array of segments to form our rope
                             for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
                                 let seg = this.scene.matter.add.image(0, 0, 'seg', null, {shape: 'circle', mass:0.1});
+                                
+                                // First segment binds to a point in the world
                                 if (i == 0) {
                                     this.scene.p1.grappleArray = [];
                                     this.scene.p1.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.001, {damping: .8, pointA: {x: this.x, y: this.y}}))
                                 }
+                                // Otherwise attach to the previous segment
                                 else
                                 {
                                     this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.001, {damping: .8}));
                                 }
                                 prev = seg;
+
+                                // Attach the player to the very last segment the loop makes
                                 if (i == Math.floor(ropeLength / ropeStep) - 1) {
                                     this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.001, {damping: .8}));
                                 }
