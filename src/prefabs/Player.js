@@ -13,12 +13,18 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
         this.grappleForce = .0005;
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
-        this.jumpHeight = 7;
+        this.jumpHeight = 10;
         
         //Apex Floating Variables
         this.maxUpwardForce = 0.003;
-        this.startingVelocity = 10000;
-        this.terminatingVelocity = 0;
+        this.startingVelocity = 1;
+        this.terminatingVelocity = 1;
+
+        // Value to apply additional force to player after releasing grapple
+        this.yBoost = 0.07;
+        this.grappleReleaseForce = 0.03;
+        this.canBoost = false;
+
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
@@ -88,14 +94,14 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         });
 
-        scene.input.on('pointerup', function () {
+        scene.input.on('pointerup', () => {
             console.log('unclick!');
             if (this.scene.p1.isGrappled) {
-                this.scene.matter.world.removeConstraint(this.scene.p1.grapple);
+                this.scene.matter.world.removeConstraint(this.scene.p1.grapple); 
                 this.scene.p1.isGrappled = false;
+                this.canBoost = true;
             }
         })
-
     }
 
     update() {
@@ -113,9 +119,22 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }
         // let isGrounded = (this.lastGrounded == this.coyoteTime); use this if we need different movement when airborne
 
-        if(this.body.velocity.y > -this.startingVelocity && this.body.velocity.y < this.terminatingVelocity && keyW.isDown) {
+        // Controls Air gravity adjustment
+        let canAirGravity = this.body.velocity.y > -this.startingVelocity && this.body.velocity.y < this.terminatingVelocity && !this.scene.p1.isGrappled;
+        if(canAirGravity) {
             this.applyForce({x:0, y:-this.maxUpwardForce});
-        }   
+        }
+
+        // Post Grapple Boost
+        if(this.canBoost) {
+            let dir = Math.atan2(this.body.velocity.y, this.body.velocity.x);
+            let boostForceY =  (Math.sin(dir) * this.grappleReleaseForce) - this.yBoost;
+            let boostForceX =  Math.cos(dir) * this.grappleReleaseForce;
+            console.log(dir * 180 / Math.PI);
+            this.applyForce({x: boostForceX, y: boostForceY});
+            console.log({x: Math.cos(dir) * this.grappleReleaseForce, y: Math.sin(dir) * this.grappleReleaseForce});
+            this.canBoost = false;
+        }
 
         if(keyA.isDown) {
             if (!this.flipX) this.flipX = true;
@@ -188,8 +207,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
     }
-
-
 
     resetTouching() {
         this.isTouching.left = false;
