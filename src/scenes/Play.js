@@ -16,7 +16,7 @@ class Play extends Phaser.Scene {
         this.p1 = new Player(this, this.matter.world, 220, 300, 'chameleon'); // do we need setOrigin?
         this.ground = this.matter.add.image(320, 400, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" });
         this.ground.setInteractive();
-        this.ceiling = this.matter.add.image(320, 200, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" });
+        this.ceiling = this.matter.add.image(40, 40, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" });
         this.ceiling.setInteractive();
 
 
