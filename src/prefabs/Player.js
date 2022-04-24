@@ -13,7 +13,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
         this.grappleForce = .0005;
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
-        this.jumpHeight = 10;
+        this.jumpHeight = 9;
         
         //Apex Floating Variables
         this.maxUpwardForce = 0.003;
@@ -80,7 +80,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         world.on('collisionstart', this.onSensorCollide, this);
         world.on('collisionactive', this.onSensorCollide, this);
 
-        scene.input.on('pointerdown', function (pointer, currentlyOver) {
+        scene.input.on('pointerdown', (pointer, currentlyOver) => {
             if (!this.scene.p1.isGrappled) {
                 for (let i = 0; i < currentlyOver.length; i++) {
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
