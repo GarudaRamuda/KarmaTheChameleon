@@ -148,7 +148,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 this.setTexture('chameleon');
                 this.canBoost = true;
             }
-        }
+        })
     }
 
     update() {
