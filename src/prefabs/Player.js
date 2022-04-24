@@ -11,7 +11,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // Set up player movement params
         this.groundForce = 0.045;
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
+
         this.grappleForce = .0005;
+
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
         this.jumpHeight = 9;
         
@@ -25,7 +27,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 
-
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
         this.radius = scene.add.sprite(0, 0, 'radius');
@@ -33,6 +34,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleRange = this.radius.width / 2;
         this.isGrappled = false;
         this.grapple = null;
+        this.grappleArray = null;
+        this.bodyArray = null;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
@@ -80,14 +83,53 @@ class Player extends Phaser.Physics.Matter.Sprite {
         world.on('collisionstart', this.onSensorCollide, this);
         world.on('collisionactive', this.onSensorCollide, this);
 
+        // Grapple logic
         scene.input.on('pointerdown', (pointer, currentlyOver) => {
-            if (!this.scene.p1.isGrappled) {
+            if (!this.isGrappled) {
                 for (let i = 0; i < currentlyOver.length; i++) {
+                    // Check that the clicked body is considered grapplable
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
-                        let ropeLength = Phaser.Math.Distance.BetweenPoints(this, this.scene.p1);
-                        if (ropeLength <= this.scene.p1.grappleRange) {
-                            this.scene.p1.grapple = this.scene.matter.add.worldConstraint(this.scene.p1, ropeLength, 0.1, {pointA: {x: this.x, y: this.y}});
-                            this.scene.p1.isGrappled = true;
+                        // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
+                        let realRopeLength = Phaser.Math.Distance.BetweenPoints(pointer, this);
+                        let ropeLength = realRopeLength / 1.75;
+
+                        // adjust ropeStep to create more rope segments
+                        let ropeStep = Math.floor(ropeLength/4);
+
+                        if (realRopeLength <= this.grappleRange) {
+                            let prev;
+
+                            // Create a line to find the points along it for spawning bodies
+                            let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
+                            let points = Phaser.Geom.Line.BresenhamPoints(line, ropeStep);
+                            
+                            this.grappleArray = [];
+                            this.bodyArray = [];
+                            // Generate an array of segments to form our rope
+                            for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
+                                let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
+                                this.bodyArray.push(seg);
+
+                                // First segment binds to a point in the world
+                                if (i == 0) {
+                                    // worldConstraint(body, length, stiffness, {options})
+                                    this.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.4, {damping: .8, pointA: {x: pointer.worldX, y: pointer.worldY}}))
+                                }
+                                // Otherwise attach to the previous segment
+                                else
+                                {
+                                    // joint(bodyA, bodyB, length, stiffness, {options})
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.4, {damping: .8}));
+                                }
+                                prev = seg;
+
+                                // Attach the player to the very last segment the loop makes
+                                if (i == Math.floor(ropeLength / ropeStep) - 1) {
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.4, {damping: .8}));
+                                }
+                            }
+                            this.isGrappled = true;
+                            this.setTexture('chameleonGrappled');
                         }
                     }
                 }
@@ -96,12 +138,17 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         scene.input.on('pointerup', () => {
             console.log('unclick!');
-            if (this.scene.p1.isGrappled) {
-                this.scene.matter.world.removeConstraint(this.scene.p1.grapple); 
-                this.scene.p1.isGrappled = false;
+            if (this.isGrappled) {
+                this.scene.matter.world.removeConstraint(this.grappleArray);
+                for (let i = 0; i < this.bodyArray.length; i++) {
+                    this.bodyArray[i].visible = false;
+                }
+                this.scene.matter.world.remove(this.bodyArray);
+                this.isGrappled = false;
+                this.setTexture('chameleon');
                 this.canBoost = true;
             }
-        })
+        }
     }
 
     update() {
