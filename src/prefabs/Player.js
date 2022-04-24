@@ -11,8 +11,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // Set up player movement params
         this.groundForce = 0.045;
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
-        this.airForce = .2;
-        this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
+
+        this.grappleForce = .0005;
         this.jumpHeight = 7;
         
         //Apex Floating Variables
@@ -22,6 +22,13 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
+        this.radius = scene.add.sprite(0, 0, 'radius');
+
+        this.grappleRange = this.radius.width / 2;
+        this.isGrappled = false;
+        this.grapple = null;
+        this.grappleArray = null;
+        this.bodyArray = null;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
@@ -44,14 +51,16 @@ class Player extends Phaser.Physics.Matter.Sprite {
             right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.25, { isSensor: true })
         };
     
-        // Assemble the compound body and properties
+        // Assemble the compound body and physics properties
         const compoundBody = Body.create({
             parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right],
             frictionStatic: 0,
             frictionAir: 0,
             friction: 0.3,
             mass: 4,
+            gravityScale: {x: 0.75, y: 0.75},
             render: { sprite: { xOffset: 0.5, yOffset: 0.5} },
+            ignorePointer: true,
         })
         this.setExistingBody(compoundBody)
 
@@ -66,9 +75,79 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // call onSensorCollide
         world.on('collisionstart', this.onSensorCollide, this);
         world.on('collisionactive', this.onSensorCollide, this);
+
+        // Grapple logic
+        scene.input.on('pointerdown', (pointer, currentlyOver) => {
+            if (!this.isGrappled) {
+                for (let i = 0; i < currentlyOver.length; i++) {
+                    // Check that the clicked body is considered grapplable
+                    if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
+                        // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
+                        let realRopeLength = Phaser.Math.Distance.BetweenPoints(pointer, this);
+                        let ropeLength = realRopeLength / 1.75;
+
+                        // adjust ropeStep to create more rope segments
+                        let ropeStep = Math.floor(ropeLength/4);
+
+                        if (realRopeLength <= this.grappleRange) {
+                            let prev;
+
+                            // Create a line to find the points along it for spawning bodies
+                            let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
+                            let points = Phaser.Geom.Line.BresenhamPoints(line, ropeStep);
+                            
+                            this.grappleArray = [];
+                            this.bodyArray = [];
+                            // Generate an array of segments to form our rope
+                            for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
+                                let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
+                                this.bodyArray.push(seg);
+
+                                // First segment binds to a point in the world
+                                if (i == 0) {
+                                    // worldConstraint(body, length, stiffness, {options})
+                                    this.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.4, {damping: .8, pointA: {x: pointer.worldX, y: pointer.worldY}}))
+                                }
+                                // Otherwise attach to the previous segment
+                                else
+                                {
+                                    // joint(bodyA, bodyB, length, stiffness, {options})
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.4, {damping: .8}));
+                                }
+                                prev = seg;
+
+                                // Attach the player to the very last segment the loop makes
+                                if (i == Math.floor(ropeLength / ropeStep) - 1) {
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.4, {damping: .8}));
+                                }
+                            }
+                            this.isGrappled = true;
+                            this.setTexture('chameleonGrappled');
+                        }
+                    }
+                }
+            }
+        });
+
+        scene.input.on('pointerup', () => {
+            console.log('unclick!');
+            if (this.isGrappled) {
+                this.scene.matter.world.removeConstraint(this.grappleArray);
+                for (let i = 0; i < this.bodyArray.length; i++) {
+                    this.bodyArray[i].visible = false;
+                }
+                this.scene.matter.world.remove(this.bodyArray);
+                this.isGrappled = false;
+                this.setTexture('chameleon');
+            }
+        })
+
     }
 
     update() {
+        this.radius.x = this.x;
+        this.radius.y = this.y;
+
         if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
 
         const velocity = this.body.velocity;
@@ -85,12 +164,27 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }   
 
         if(keyA.isDown) {
-            this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
-            if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
+            if (!this.flipX) this.flipX = true;
+            if (this.isGrappled) { 
+                this.applyForce({x: -this.grappleForce, y:0});
+            }
+            else this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
+            if (!this.isGrappled) {
+                if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
+            }
         }
         if(keyD.isDown) {
-            this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
-            if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
+            if (this.flipX) this.flipX = false;
+            // Apply smaller force on a grapple
+            if (this.isGrappled){
+                this.applyForce({x: this.grappleForce, y:0});
+            }
+            else this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
+
+            // Cap speed when not grappling
+            if (!this.isGrappled) {
+                if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
+            }
         }
         if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
@@ -125,7 +219,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     otherBody = bodyA;
                     playerBody = bodyB;
                 }
-
                 if (otherBody.isSensor) return; // don't need collisions with nonphysical objects
                 if (playerBody === this.sensors.left) {
                     this.isTouching.left = true;
@@ -141,6 +234,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
     }
+
+
 
     resetTouching() {
         this.isTouching.left = false;

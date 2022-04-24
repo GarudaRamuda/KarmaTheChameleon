@@ -11,10 +11,11 @@ let config = {
             debug: true,
         }
     },
+    pixelArt: true,
     fps: {
         target: 60,
         forceSetTimeOut: true
-      },
+    },
     scene: [Play]
 };
 
