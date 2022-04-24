@@ -23,6 +23,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.isGrappled = false;
         this.grapple = null;
         this.grappleArray = null;
+        this.bodyArray = null;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
@@ -77,20 +78,28 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     // Check that the clicked body is considered grapplable
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
                         // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
-                        let ropeLength = Phaser.Math.Distance.BetweenPoints(pointer, this) / 1.75;
+                        let realRopeLength = Phaser.Math.Distance.BetweenPoints(pointer, this);
+                        let ropeLength = realRopeLength / 1.75;
+
                         // adjust ropeStep to create more rope segments
                         let ropeStep = Math.floor(ropeLength/4);
-                        if (ropeLength <= this.grappleRange) {
-                            // this.scene.p1.grapple = this.scene.matter.add.worldConstraint(this.scene.p1, ropeLength/1.5, 0.001, {damping: .8,pointA: {x: this.x, y: this.y}});
+
+                        if (realRopeLength <= this.grappleRange) {
                             let prev;
 
+                            // Create a line to find the points along it for spawning bodies
+                            let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
+                            let points = Phaser.Geom.Line.BresenhamPoints(line, ropeStep);
+                            
+                            this.grappleArray = [];
+                            this.bodyArray = [];
                             // Generate an array of segments to form our rope
                             for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
-                                let seg = this.scene.matter.add.image(0, 0, 'seg', null, {shape: 'circle', mass:0.1});
+                                let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
+                                this.bodyArray.push(seg);
 
                                 // First segment binds to a point in the world
                                 if (i == 0) {
-                                    this.grappleArray = [];
                                     // worldConstraint(body, length, stiffness, {options})
                                     this.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.4, {damping: .8, pointA: {x: pointer.worldX, y: pointer.worldY}}))
                                 }
@@ -108,6 +117,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                                 }
                             }
                             this.isGrappled = true;
+                            this.setTexture('chameleonGrappled');
                         }
                     }
                 }
@@ -118,7 +128,12 @@ class Player extends Phaser.Physics.Matter.Sprite {
             console.log('unclick!');
             if (this.isGrappled) {
                 this.scene.matter.world.removeConstraint(this.grappleArray);
+                for (let i = 0; i < this.bodyArray.length; i++) {
+                    this.bodyArray[i].visible = false;
+                }
+                this.scene.matter.world.remove(this.bodyArray);
                 this.isGrappled = false;
+                this.setTexture('chameleon');
             }
         })
 

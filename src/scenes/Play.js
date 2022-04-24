@@ -6,12 +6,16 @@ class Play extends Phaser.Scene {
     preload() {
         this.load.image('ground', './assets/ground.png');
         this.load.image('chameleon', './assets/chameleon.png');
+        this.load.image('chameleonGrappled', './assets/chameleonGrappled.png');
         this.load.image('radius', './assets/radius.png');
         this.load.image('seg', './assets/seg.png');
+        this.load.image('sky', './assets/sky.png');
     }
 
 
     create() {
+        this.sky = this.add.tileSprite(0,0, 640,480, 'sky').setOrigin(0,0);
+
         this.matter.world.setBounds();
 
         this.p1 = new Player(this, this.matter.world, 220, 300, 'chameleon'); // do we need setOrigin?
