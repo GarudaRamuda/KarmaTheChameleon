@@ -14,7 +14,7 @@ let config = {
     pixelArt: true,
     fps: {
         target: 60,
-        forceSetTimeOut: true
+        forceSetTimeOut: false
     },
     scene: [Play]
 };
