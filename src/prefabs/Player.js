@@ -11,7 +11,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // Set up player movement params
         this.groundForce = 0.045;
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
-        this.airForce = .2;
+        this.grappleForce = .0005;
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
         this.jumpHeight = 7;
         
@@ -22,6 +22,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
+        this.radius = scene.add.sprite(0, 0, 'radius');
+
+        this.grappleRange = this.radius.width / 2;
+        this.isGrappled = false;
+        this.grapple = null;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
@@ -44,14 +49,16 @@ class Player extends Phaser.Physics.Matter.Sprite {
             right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.25, { isSensor: true })
         };
     
-        // Assemble the compound body and properties
+        // Assemble the compound body and physics properties
         const compoundBody = Body.create({
             parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right],
             frictionStatic: 0,
             frictionAir: 0,
             friction: 0.3,
             mass: 4,
+            gravityScale: {x: 0.75, y: 0.75},
             render: { sprite: { xOffset: 0.5, yOffset: 0.5} },
+            ignorePointer: true,
         })
         this.setExistingBody(compoundBody)
 
@@ -66,9 +73,35 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // call onSensorCollide
         world.on('collisionstart', this.onSensorCollide, this);
         world.on('collisionactive', this.onSensorCollide, this);
+
+        scene.input.on('pointerdown', function (pointer, currentlyOver) {
+            if (!this.scene.p1.isGrappled) {
+                for (let i = 0; i < currentlyOver.length; i++) {
+                    if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
+                        let ropeLength = Phaser.Math.Distance.BetweenPoints(this, this.scene.p1);
+                        if (ropeLength <= this.scene.p1.grappleRange) {
+                            this.scene.p1.grapple = this.scene.matter.add.worldConstraint(this.scene.p1, ropeLength, 0.1, {pointA: {x: this.x, y: this.y}});
+                            this.scene.p1.isGrappled = true;
+                        }
+                    }
+                }
+            }
+        });
+
+        scene.input.on('pointerup', function () {
+            console.log('unclick!');
+            if (this.scene.p1.isGrappled) {
+                this.scene.matter.world.removeConstraint(this.scene.p1.grapple);
+                this.scene.p1.isGrappled = false;
+            }
+        })
+
     }
 
     update() {
+        this.radius.x = this.x;
+        this.radius.y = this.y;
+
         if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
 
         const velocity = this.body.velocity;
@@ -85,12 +118,27 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }   
 
         if(keyA.isDown) {
-            this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
-            if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
+            if (!this.flipX) this.flipX = true;
+            if (this.isGrappled) { 
+                this.applyForce({x: -this.grappleForce, y:0});
+            }
+            else this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
+            if (!this.isGrappled) {
+                if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
+            }
         }
         if(keyD.isDown) {
-            this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
-            if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
+            if (this.flipX) this.flipX = false;
+            // Apply smaller force on a grapple
+            if (this.isGrappled){
+                this.applyForce({x: this.grappleForce, y:0});
+            }
+            else this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
+
+            // Cap speed when not grappling
+            if (!this.isGrappled) {
+                if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
+            }
         }
         if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
@@ -125,7 +173,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     otherBody = bodyA;
                     playerBody = bodyB;
                 }
-
                 if (otherBody.isSensor) return; // don't need collisions with nonphysical objects
                 if (playerBody === this.sensors.left) {
                     this.isTouching.left = true;
@@ -141,6 +188,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
     }
+
+
 
     resetTouching() {
         this.isTouching.left = false;
