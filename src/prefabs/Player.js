@@ -12,7 +12,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.groundForce = 0.045;
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
         this.grappleForce = .0005;
-        this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
+        // this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
         this.jumpHeight = 6.25;
 
         // Track when sensors are touching something
@@ -71,16 +71,16 @@ class Player extends Phaser.Physics.Matter.Sprite {
         world.on('collisionactive', this.onSensorCollide, this);
 
         // Grapple logic
-        scene.input.on('pointerdown', function (pointer, currentlyOver) {
-            if (!this.scene.p1.isGrappled) {
+        scene.input.on('pointerdown', (pointer, currentlyOver) => {
+            if (!this.isGrappled) {
                 for (let i = 0; i < currentlyOver.length; i++) {
                     // Check that the clicked body is considered grapplable
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
                         // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
-                        let ropeLength = Phaser.Math.Distance.BetweenPoints(this, this.scene.p1) / 1.75;
+                        let ropeLength = Phaser.Math.Distance.BetweenPoints(pointer, this) / 1.75;
                         // adjust ropeStep to create more rope segments
                         let ropeStep = Math.floor(ropeLength/4);
-                        if (ropeLength <= this.scene.p1.grappleRange) {
+                        if (ropeLength <= this.grappleRange) {
                             // this.scene.p1.grapple = this.scene.matter.add.worldConstraint(this.scene.p1, ropeLength/1.5, 0.001, {damping: .8,pointA: {x: this.x, y: this.y}});
                             let prev;
 
@@ -90,35 +90,35 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
                                 // First segment binds to a point in the world
                                 if (i == 0) {
-                                    this.scene.p1.grappleArray = [];
+                                    this.grappleArray = [];
                                     // worldConstraint(body, length, stiffness, {options})
-                                    this.scene.p1.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.4, {damping: .8, pointA: {x: this.x, y: this.y}}))
+                                    this.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.4, {damping: .8, pointA: {x: pointer.worldX, y: pointer.worldY}}))
                                 }
                                 // Otherwise attach to the previous segment
                                 else
                                 {
                                     // joint(bodyA, bodyB, length, stiffness, {options})
-                                    this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.4, {damping: .8}));
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.4, {damping: .8}));
                                 }
                                 prev = seg;
 
                                 // Attach the player to the very last segment the loop makes
                                 if (i == Math.floor(ropeLength / ropeStep) - 1) {
-                                    this.scene.p1.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.4, {damping: .8}));
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.4, {damping: .8}));
                                 }
                             }
-                            this.scene.p1.isGrappled = true;
+                            this.isGrappled = true;
                         }
                     }
                 }
             }
         });
 
-        scene.input.on('pointerup', function () {
+        scene.input.on('pointerup', () => {
             console.log('unclick!');
-            if (this.scene.p1.isGrappled) {
-                this.scene.matter.world.removeConstraint(this.scene.p1.grappleArray);
-                this.scene.p1.isGrappled = false;
+            if (this.isGrappled) {
+                this.scene.matter.world.removeConstraint(this.grappleArray);
+                this.isGrappled = false;
             }
         })
 
