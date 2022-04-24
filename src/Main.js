@@ -13,6 +13,10 @@ let config = {
     },
     scene: [Play],
     pixelArt: true,
+    fps: {
+        target: 60,
+        forceSetTimeOut: true
+     }
 };
 
 let game = new Phaser.Game(config);
