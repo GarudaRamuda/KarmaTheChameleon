@@ -24,7 +24,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.startingVelocity = 1;
         this.terminatingVelocity = 1;
 
-        this.groundSoundPlayed = false;
 
         // Value to apply additional force to player after releasing grapple
         this.yBoost = 0.07;
@@ -98,7 +97,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                         let ropeLength = realRopeLength / 1.75;
 
                         // adjust ropeStep to create more rope segments
-                        let ropeStep = Math.floor(ropeLength/2);
+                        let ropeStep = Math.floor(ropeLength/3);
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
@@ -163,20 +162,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
 
-        if (this.isGrappled) {
-            let dir = Math.atan2(this.body.velocity.y, this.body.velocity.x);
-            let boostForceY = Math.sin(dir) * this.grapplePush;
-            let boostForceX = Math.cos(dir) * this.grapplePush;
-            this.body.velocity.y += boostForceY;
-            this.body.velocity.x += boostForceX;  
-            this.applyForce({x: boostForceX, y:boostForceY}); 
-        }
-
         const velocity = this.body.velocity;
         if (this.isTouching.bottom) {
-            if(!this.groundSoundPlayed) {
+            if(this.lastGrounded != this.coyoteTime) {
                 this.scene.sound.play('sound_land');
-                this.groundSoundPlayed = true;
             } 
             this.lastGrounded = this.coyoteTime;
         }
