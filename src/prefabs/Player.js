@@ -98,7 +98,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                         let ropeLength = realRopeLength / 1.75;
 
                         // adjust ropeStep to create more rope segments
-                        let ropeStep = Math.floor(ropeLength/4);
+                        let ropeStep = Math.floor(ropeLength/2);
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
