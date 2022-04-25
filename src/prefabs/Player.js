@@ -14,7 +14,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.groundForce = 0.045;
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
 
-        this.grappleForce = .0005;
+        this.grappleForce = .0007;
 
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
         this.jumpHeight = 9;
@@ -106,7 +106,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             // Create a line to find the points along it for spawning bodies
                             let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
                             let points = Phaser.Geom.Line.BresenhamPoints(line, ropeStep);
-                            
+                            let stiffness = 0.4;
+                            let damping = 0.8;
                             this.grappleArray = [];
                             this.bodyArray = [];
                             // Generate an array of segments to form our rope
@@ -117,19 +118,19 @@ class Player extends Phaser.Physics.Matter.Sprite {
                                 // First segment binds to a point in the world
                                 if (i == 0) {
                                     // worldConstraint(body, length, stiffness, {options})
-                                    this.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, 0.4, {damping: .8, pointA: {x: pointer.worldX, y: pointer.worldY}}))
+                                    this.grappleArray.push(this.scene.matter.add.worldConstraint(seg, ropeStep, stiffness, {damping: damping, pointA: {x: pointer.worldX, y: pointer.worldY}}))
                                 }
                                 // Otherwise attach to the previous segment
                                 else
                                 {
                                     // joint(bodyA, bodyB, length, stiffness, {options})
-                                    this.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, 0.4, {damping: .8}));
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, seg, ropeStep, stiffness, {damping: damping}));
                                 }
                                 prev = seg;
 
                                 // Attach the player to the very last segment the loop makes
                                 if (i == Math.floor(ropeLength / ropeStep) - 1) {
-                                    this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.4, {damping: .8}));
+                                    this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, stiffness, {damping: damping}));
                                 }
                             }
                             scene.sound.play('sound_stick');
