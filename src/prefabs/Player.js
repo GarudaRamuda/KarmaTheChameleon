@@ -15,6 +15,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
 
         this.grappleForce = .0007;
+        this.grapplePush = 0.003;
 
         this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
         this.jumpHeight = 9;
