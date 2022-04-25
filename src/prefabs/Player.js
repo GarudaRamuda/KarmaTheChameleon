@@ -17,7 +17,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleForce = .0007;
         this.grapplePush = 0.003;
 
-        this.airSpeedSoftCap = 0.4; // threshold for disabling impulse from movement keys, actual velocity not capped
         this.jumpHeight = 9;
         
         //Apex Floating Variables
@@ -25,7 +24,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.startingVelocity = 1;
         this.terminatingVelocity = 1;
 
-        this.groundSoundPlayed = false;
 
         // Value to apply additional force to player after releasing grapple
         this.yBoost = 0.07;
@@ -38,7 +36,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         this.grappleRange = this.radius.width / 2;
         this.isGrappled = false;
-        this.grapple = null;
+        this.outOfGrapple = false;
         this.grappleArray = null;
         this.bodyArray = null;
         // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
@@ -99,7 +97,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                         let ropeLength = realRopeLength / 1.75;
 
                         // adjust ropeStep to create more rope segments
-                        let ropeStep = Math.floor(ropeLength/2);
+                        let ropeStep = Math.floor(ropeLength/3);
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
@@ -144,7 +142,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         });
 
         scene.input.on('pointerup', () => {
-            console.log('unclick!');
             if (this.isGrappled) {
                 this.scene.matter.world.removeConstraint(this.grappleArray);
                 for (let i = 0; i < this.bodyArray.length; i++) {
@@ -154,6 +151,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 this.isGrappled = false;
                 this.setTexture('chameleon');
                 this.canBoost = true;
+                this.outOfGrapple = true;
             }
         })
     }
@@ -172,13 +170,13 @@ class Player extends Phaser.Physics.Matter.Sprite {
             this.body.velocity.x += boostForceX;  
             this.applyForce({x: boostForceX, y:boostForceY}); 
         }
-
+        
         const velocity = this.body.velocity;
         if (this.isTouching.bottom) {
-            if(!this.groundSoundPlayed) {
+            if(this.lastGrounded != this.coyoteTime) {
                 this.scene.sound.play('sound_land');
-                this.groundSoundPlayed = true;
             } 
+            this.outOfGrapple = false;
             this.lastGrounded = this.coyoteTime;
         }
         else {
@@ -208,8 +206,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
             if (this.isGrappled) { 
                 this.applyForce({x: -this.grappleForce, y:0});
             }
-            else this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
-            if (!this.isGrappled) {
+            else if (!this.outOfGrapple || (this.outOfGrapple && velocity.x > -this.groundSpeedCap)) {
+                this.applyForce({x: -this.groundForce, y: 0}); // move negative x-axis
+            }
+            if (!this.isGrappled && !this.outOfGrapple) {
                 if (velocity.x < -this.groundSpeedCap) this.setVelocityX(-this.groundSpeedCap);
             }
         }
@@ -219,10 +219,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
             if (this.isGrappled){
                 this.applyForce({x: this.grappleForce, y:0});
             }
-            else this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
-
+            else if (!this.outOfGrapple || (this.outOfGrapple && velocity.x < this.groundSpeedCap)) {
+                this.applyForce({x: this.groundForce, y: 0}); // move positive x-axis
+            }
             // Cap speed when not grappling
-            if (!this.isGrappled) {
+            if (!this.isGrappled && !this.outOfGrapple) {
                 if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
             }
         }
