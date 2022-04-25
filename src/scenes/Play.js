@@ -4,6 +4,13 @@ class Play extends Phaser.Scene {
     }
 
     preload() {
+
+        //load sounds
+        this.load.audio('sound_stick', './assets/sounds/stick.wav');
+        this.load.audio('sound_jump', './assets/sounds/jump.wav');
+        this.load.audio('sound_land', './assets/sounds/land.wav');
+
+        //load images
         this.load.image('ground', './assets/ground.png');
         this.load.image('chameleon', './assets/chameleon.png');
         this.load.image('chameleonGrappled', './assets/chameleonGrappled.png');
