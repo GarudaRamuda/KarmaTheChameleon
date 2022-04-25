@@ -7,6 +7,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, world, x, y, texture, frame, options) {
         super (world, 0, 0, texture, frame, options);
         scene.add.existing(this);
+        //global
+        this.scene = scene;
 
         // Set up player movement params
         this.groundForce = 0.045;
@@ -21,6 +23,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.maxUpwardForce = 0.003;
         this.startingVelocity = 1;
         this.terminatingVelocity = 1;
+
+        this.groundSoundPlayed = false;
 
         // Value to apply additional force to player after releasing grapple
         this.yBoost = 0.07;
@@ -128,6 +132,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                                     this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, 0.4, {damping: .8}));
                                 }
                             }
+                            scene.sound.play('sound_stick');
                             this.isGrappled = true;
                             this.setTexture('chameleonGrappled');
                         }
@@ -159,6 +164,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         const velocity = this.body.velocity;
         if (this.isTouching.bottom) {
+            if(!this.groundSoundPlayed) {
+                this.scene.sound.play('sound_land');
+                this.groundSoundPlayed = true;
+            } 
             this.lastGrounded = this.coyoteTime;
         }
         else {
@@ -209,6 +218,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
             this.lastGrounded = 0;
+            this.scene.sound.play('sound_jump');
+            this.groundSoundPlayed = false;
         }
         else if (Phaser.Input.Keyboard.JustDown(keyW)) {
             this.jumpBuffer = this.bufferWindow;
