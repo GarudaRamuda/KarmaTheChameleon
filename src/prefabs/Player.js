@@ -163,7 +163,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
 
         if (this.isGrappled) {
-            rotateAroundPoint();
+            this.rotateAroundPoint();
         }
         
         const velocity = this.body.velocity;
