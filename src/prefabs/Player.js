@@ -43,6 +43,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
 
+        this.ropeJustCreated = false;
+        this.ropeCreatedFrameAgo = false;
+
         // Let player jump even if they press too early before landing
         this.bufferWindow = 16;
         this.jumpBuffer = 0;
@@ -100,13 +103,14 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
                         // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
                         let realRopeLength = Phaser.Math.Distance.BetweenPoints(pointer, this);
-                        let ropeLength = realRopeLength / 1.75;
+                        let ropeLength = realRopeLength;
 
                         // adjust ropeStep to create more rope segments
                         let ropeStep = Math.floor(ropeLength/3);
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
+                            this.ropeJustCreated = true;
 
                             // save grapple point
                             this.grapplePointX = pointer.worldX;
@@ -169,6 +173,15 @@ class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     update() {
+
+        if(this.ropeCreatedFrameAgo) {
+            this.ropeCreatedFrameAgo = false;
+        }
+
+        if(this.ropeJustCreated) {
+            this.ropeJustCreated = false;
+            this.ropeCreatedFrameAgo = true;
+        }
 
         // Rotate
         if (this.scene.p1.body.velocity.x < 0 ) {
