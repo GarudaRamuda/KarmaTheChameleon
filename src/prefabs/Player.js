@@ -43,6 +43,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
 
+        this.ropeJustCreated = false;
+        this.ropeCreatedFrameAgo = false;
+
         // Let player jump even if they press too early before landing
         this.bufferWindow = 16;
         this.jumpBuffer = 0;
@@ -100,29 +103,34 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
                         // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
                         let realRopeLength = Phaser.Math.Distance.BetweenPoints(pointer, this);
-                        let ropeLength = realRopeLength / 1.75;
+                        let ropeLength = realRopeLength / 1;
 
                         // adjust ropeStep to create more rope segments
-                        let ropeStep = Math.floor(ropeLength/3);
+                        let num_steps = 3;
+                        let ropeStep = ropeLength / num_steps;
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
 
+                            //used to debug rope
+                            this.ropeJustCreated = true;
+
                             // save grapple point
                             this.grapplePointX = pointer.worldX;
                             this.grapplePointY = pointer.worldY;
+                            
                             // set backflip
                             this.backflip = Math.floor(Math.random() * 3);
 
                             // Create a line to find the points along it for spawning bodies
                             let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
-                            let points = Phaser.Geom.Line.BresenhamPoints(line, ropeStep);
+                            let points = line.getPoints(num_steps, ropeStep);
                             let stiffness = 0.4;
                             let damping = 0.8;
                             this.grappleArray = [];
                             this.bodyArray = [];
                             // Generate an array of segments to form our rope
-                            for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
+                            for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
                                 let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
                                 this.bodyArray.push(seg);
 
@@ -140,13 +148,15 @@ class Player extends Phaser.Physics.Matter.Sprite {
                                 prev = seg;
 
                                 // Attach the player to the very last segment the loop makes
-                                if (i == Math.floor(ropeLength / ropeStep) - 1) {
+                                if (i == Math.floor(ropeLength / ropeStep) - 2) {
                                     this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, stiffness, {damping: damping}));
                                 }
                             }
                             scene.sound.play('sound_stick');
                             this.isGrappled = true;
                             this.setTexture('chameleonGrappled');
+                            this.setVelocityX(0);
+                            this.setVelocityY(0);
                         }
                     }
                 }
@@ -170,6 +180,16 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
     update() {
 
+        if(this.ropeCreatedFrameAgo) {
+            // Use this line as a break point to see the rope segments the frame after their creation
+            this.ropeCreatedFrameAgo = false;
+        }
+
+        if(this.ropeJustCreated) {
+            this.ropeJustCreated = false;
+            this.ropeCreatedFrameAgo = true;
+        }
+
         // Rotate
         if (this.scene.p1.body.velocity.x < 0 ) {
             this.isMovingLeft = true;
@@ -191,7 +211,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 this.flipX = true;  
                 this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x, this.scene.p1.y, 1);          
             } else {
-                console.log("Backflip: ", this.backflip);
                 this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x+1, this.scene.p1.y, this.backflip);                     
             }
         }
@@ -229,9 +248,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             let dir = Math.atan2(this.body.velocity.y, this.body.velocity.x);
             let boostForceY =  (Math.sin(dir) * this.grappleReleaseForce) - this.yBoost;
             let boostForceX =  Math.cos(dir) * this.grappleReleaseForce;
-            console.log(dir * 180 / Math.PI);
             this.applyForce({x: boostForceX, y: boostForceY});
-            console.log({x: Math.cos(dir) * this.grappleReleaseForce, y: Math.sin(dir) * this.grappleReleaseForce});
             this.canBoost = false;
         }
 
@@ -305,11 +322,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 if (otherBody.isSensor) return; // don't need collisions with nonphysical objects
                 if (playerBody === this.sensors.left) {
                     this.isTouching.left = true;
-                    if (pairs.separation > 0.25) this.sprite.x += pairs.separation - 0.25; // nudge the main body away from the wall to avoid friction
+                    if (pairs.separation > 0.5) this.sprite.x += pairs.separation + 2; // nudge the main body away from the wall to avoid friction
                 }
                 else if (playerBody === this.sensors.right) {
                     this.isTouching.right = true;
-                    if (pairs.separation > 0.25) this.sprite.x -= pairs.separation - 0.25;
+                    if (pairs.separation > 0.5) this.sprite.x -= pairs.separation + 2;
                 }
                 else if (playerBody === this.sensors.bottom) {
                     this.isTouching.bottom = true;
