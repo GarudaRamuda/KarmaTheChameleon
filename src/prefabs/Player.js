@@ -8,9 +8,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
         super (world, 0, 0, texture, frame, options);
         scene.add.existing(this);
         //global
+        this.setScale(2);
         this.scene = scene;
         this.setAlpha(0);
-        this.sprite = scene.add.sprite(0, 0, 'chameleon');
+        this.sprite = scene.add.sprite(0, 0, 'play', 'chameleonWalk1').setScale(2);
 
         // Set up player movement params
         this.groundForce = 0.045;
@@ -34,9 +35,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
-        this.radius = scene.add.sprite(0, 0, 'radius');
+        this.radius = scene.add.sprite(0, 0, 'play', 'radius').setScale(2);
 
-        this.grappleRange = this.radius.width / 2;
+        this.grappleRange = this.radius.displayWidth / 2;
         this.isGrappled = false;
         this.outOfGrapple = false;
         this.grappleArray = null;
@@ -125,7 +126,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             this.bodyArray = [];
                             // Generate an array of segments to form our rope
                             for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
-                                let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
+                                let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'play', 'seg', {shape: 'circle', mass:0.1}).setScale(2);
                                 this.bodyArray.push(seg);
 
                                 // First segment binds to a point in the world
@@ -148,7 +149,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             }
                             scene.sound.play('sound_stick');
                             this.isGrappled = true;
-                            this.sprite.setTexture('chameleonGrappled');
+                            this.sprite.setFrame('chameleonGrapple');
                         }
                     }
                 }
@@ -163,7 +164,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 }
                 this.scene.matter.world.remove(this.bodyArray);
                 this.isGrappled = false;
-                this.sprite.setTexture('chameleon');
+                this.sprite.setFrame('chameleonWalk1');
                 this.canBoost = true;
                 this.outOfGrapple = true;
             }

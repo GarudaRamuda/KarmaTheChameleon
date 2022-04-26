@@ -11,22 +11,19 @@ class Play extends Phaser.Scene {
         this.load.audio('sound_land', './assets/sounds/land.wav');
 
         //load images
+        this.load.atlas('play', './assets/spritesheet.png', './assets/sprites.json', null, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
         this.load.image('ground', './assets/ground.png');
-        this.load.image('chameleon', './assets/chameleon.png');
-        this.load.image('chameleonGrappled', './assets/chameleonGrappled2.png');
-        this.load.image('radius', './assets/radius.png');
-        this.load.image('seg', './assets/seg.png');
-        this.load.image('sky', './assets/sky.png');
+        this.load.image('collision', './assets/collisionmask.png');
         this.load.plugin('rexrotatetoplugin', './lib/rexrotatetoplugin.min.js' , true); // load plugin for rotate
     }
 
 
     create() {
-        this.sky = this.add.tileSprite(0,0, config.width, config.height, 'sky').setOrigin(0,0);
+        this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0,0).setScale(2);
 
         this.matter.world.setBounds();
 
-        this.p1 = new Player(this, this.matter.world, 30, 20, 'chameleon'); // do we need setOrigin?
+        this.p1 = new Player(this, this.matter.world, 30, 20, 'collision'); // do we need setOrigin?
         this.ground = this.matter.add.image(config.width/2, config.height - 50, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(2, 4);
         this.ground.setInteractive();
         this.platform = this.matter.add.image(-200, 400, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 2);
