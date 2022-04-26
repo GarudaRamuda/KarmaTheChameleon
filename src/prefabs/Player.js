@@ -100,7 +100,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     if (currentlyOver[i].body != null && currentlyOver[i].body.label == 'grapplable') {
                         // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
                         let realRopeLength = Phaser.Math.Distance.BetweenPoints(pointer, this);
-                        let ropeLength = realRopeLength / 1.75;
+                        let ropeLength = realRopeLength / 1;
 
                         // adjust ropeStep to create more rope segments
                         let ropeStep = Math.floor(ropeLength/3);
@@ -122,7 +122,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             this.grappleArray = [];
                             this.bodyArray = [];
                             // Generate an array of segments to form our rope
-                            for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
+                            for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
                                 let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
                                 this.bodyArray.push(seg);
 
@@ -140,7 +140,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                                 prev = seg;
 
                                 // Attach the player to the very last segment the loop makes
-                                if (i == Math.floor(ropeLength / ropeStep) - 1) {
+                                if (i == Math.floor(ropeLength / ropeStep) - 2) {
                                     this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, stiffness, {damping: damping}));
                                 }
                             }
@@ -191,7 +191,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 this.flipX = true;  
                 this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x, this.scene.p1.y, 1);          
             } else {
-                console.log("Backflip: ", this.backflip);
                 this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x+1, this.scene.p1.y, this.backflip);                     
             }
         }
@@ -229,9 +228,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             let dir = Math.atan2(this.body.velocity.y, this.body.velocity.x);
             let boostForceY =  (Math.sin(dir) * this.grappleReleaseForce) - this.yBoost;
             let boostForceX =  Math.cos(dir) * this.grappleReleaseForce;
-            console.log(dir * 180 / Math.PI);
             this.applyForce({x: boostForceX, y: boostForceY});
-            console.log({x: Math.cos(dir) * this.grappleReleaseForce, y: Math.sin(dir) * this.grappleReleaseForce});
             this.canBoost = false;
         }
 
@@ -305,11 +302,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 if (otherBody.isSensor) return; // don't need collisions with nonphysical objects
                 if (playerBody === this.sensors.left) {
                     this.isTouching.left = true;
-                    if (pairs.separation > 0.25) this.sprite.x += pairs.separation - 0.25; // nudge the main body away from the wall to avoid friction
+                    if (pairs.separation > 0.5) this.sprite.x += pairs.separation + 2; // nudge the main body away from the wall to avoid friction
                 }
                 else if (playerBody === this.sensors.right) {
                     this.isTouching.right = true;
-                    if (pairs.separation > 0.25) this.sprite.x -= pairs.separation - 0.25;
+                    if (pairs.separation > 0.5) this.sprite.x -= pairs.separation + 2;
                 }
                 else if (playerBody === this.sensors.bottom) {
                     this.isTouching.bottom = true;
