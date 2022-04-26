@@ -47,7 +47,7 @@ class Play extends Phaser.Scene {
         this.p1.isGrappled = false;
         // this.matter.add.worldConstraint(this.p1, 100, 1, {pointA: {x:320, y:200},});
 
-        this.p1.rotateTo = this.plugins.get('rexrotatetoplugin').add(this.p1, { // add rotate to p1
+        this.p1.sprite.rotateTo = this.plugins.get('rexrotatetoplugin').add(this.p1.sprite, { // add rotate to p1
             speed: 500
         });
     }

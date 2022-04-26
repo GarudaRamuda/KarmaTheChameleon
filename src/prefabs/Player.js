@@ -9,6 +9,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         scene.add.existing(this);
         //global
         this.scene = scene;
+        this.setAlpha(0);
+        this.sprite = scene.add.sprite(0, 0, 'chameleon');
 
         // Set up player movement params
         this.groundForce = 0.045;
@@ -146,7 +148,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             }
                             scene.sound.play('sound_stick');
                             this.isGrappled = true;
-                            this.setTexture('chameleonGrappled');
+                            this.sprite.setTexture('chameleonGrappled');
                         }
                     }
                 }
@@ -161,7 +163,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 }
                 this.scene.matter.world.remove(this.bodyArray);
                 this.isGrappled = false;
-                this.setTexture('chameleon');
+                this.sprite.setTexture('chameleon');
                 this.canBoost = true;
                 this.outOfGrapple = true;
             }
@@ -169,7 +171,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     update() {
-
+        this.sprite.x = this.x;
+        this.sprite.y = this.y;
         // Rotate
         if (this.scene.p1.body.velocity.x < 0 ) {
             this.isMovingLeft = true;
@@ -178,9 +181,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }       
         
         if (this.isGrappled) {
-            this.flipX = false;            
+            this.sprite.flipX = false;            
             this.scene.input.keyboard.removeKey('A'); // stop flipping
-            this.scene.p1.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
+            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
         } else {
             // rotate back to normal
             // does keep rotatingd
@@ -188,10 +191,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
             
             if (this.isMovingLeft) {
-                this.flipX = true;  
-                this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x, this.scene.p1.y, 1);          
+                this.sprite.flipX = true;  
+                this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x, this.sprite.y, 1);          
             } else {
-                this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x+1, this.scene.p1.y, this.backflip);                     
+                this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x+1, this.sprite.y, this.backflip);                     
             }
         }
 
@@ -233,7 +236,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }
 
         if(keyA.isDown) {
-            if (!this.flipX) this.flipX = true;
+            if (!this.sprite.flipX) this.sprite.flipX = true;
             if (this.isGrappled) { 
                 this.applyForce({x: -this.grappleForce, y:0});
             }
@@ -245,7 +248,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
         if(keyD.isDown) {
-            if (this.flipX) this.flipX = false;
+            if (this.sprite.flipX) this.sprite.flipX = false;
             // Apply smaller force on a grapple
             if (this.isGrappled){
                 this.applyForce({x: this.grappleForce, y:0});
@@ -302,11 +305,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 if (otherBody.isSensor) return; // don't need collisions with nonphysical objects
                 if (playerBody === this.sensors.left) {
                     this.isTouching.left = true;
-                    if (pairs.separation > 0.5) this.sprite.x += pairs.separation + 2; // nudge the main body away from the wall to avoid friction
+                    // TODO: Nudge main body away from walls based on the depth of collision. Difficulties accessing the members atm
                 }
                 else if (playerBody === this.sensors.right) {
                     this.isTouching.right = true;
-                    if (pairs.separation > 0.5) this.sprite.x -= pairs.separation + 2;
                 }
                 else if (playerBody === this.sensors.bottom) {
                     this.isTouching.bottom = true;
