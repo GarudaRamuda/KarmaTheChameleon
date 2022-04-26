@@ -175,6 +175,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
     update() {
 
         if(this.ropeCreatedFrameAgo) {
+            // Use this line as a break point to see the rope segments the frame after their creation
             this.ropeCreatedFrameAgo = false;
         }
 
