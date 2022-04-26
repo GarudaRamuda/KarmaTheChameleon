@@ -106,10 +106,13 @@ class Player extends Phaser.Physics.Matter.Sprite {
                         let ropeLength = realRopeLength;
 
                         // adjust ropeStep to create more rope segments
-                        let ropeStep = Math.floor(ropeLength/3);
+                        let num_steps = 4;
+                        let ropeStep = ropeLength / num_steps;
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
+
+                            //used to debug rope
                             this.ropeJustCreated = true;
 
                             // save grapple point
@@ -120,13 +123,13 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
                             // Create a line to find the points along it for spawning bodies
                             let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
-                            let points = Phaser.Geom.Line.BresenhamPoints(line, ropeStep);
+                            let points = line.getPoints(num_steps, ropeStep);
                             let stiffness = 0.4;
                             let damping = 0.8;
                             this.grappleArray = [];
                             this.bodyArray = [];
                             // Generate an array of segments to form our rope
-                            for (let i = 0; i < Math.floor(ropeLength / ropeStep); i++) {
+                            for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
                                 let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
                                 this.bodyArray.push(seg);
 
@@ -144,7 +147,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                                 prev = seg;
 
                                 // Attach the player to the very last segment the loop makes
-                                if (i == Math.floor(ropeLength / ropeStep) - 1) {
+                                if (i == Math.floor(ropeLength / ropeStep) - 2) {
                                     this.grappleArray.push(this.scene.matter.add.joint(prev, this.scene.p1, ropeStep, stiffness, {damping: damping}));
                                 }
                             }
