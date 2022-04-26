@@ -106,7 +106,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                         let ropeLength = realRopeLength / 1;
 
                         // adjust ropeStep to create more rope segments
-                        let num_steps = 4;
+                        let num_steps = 3;
                         let ropeStep = ropeLength / num_steps;
 
                         if (realRopeLength <= this.grappleRange) {
@@ -118,6 +118,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             // save grapple point
                             this.grapplePointX = pointer.worldX;
                             this.grapplePointY = pointer.worldY;
+                            
                             // set backflip
                             this.backflip = Math.floor(Math.random() * 3);
 
@@ -154,6 +155,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             scene.sound.play('sound_stick');
                             this.isGrappled = true;
                             this.setTexture('chameleonGrappled');
+                            this.setVelocityX(0);
+                            this.setVelocityY(0);
                         }
                     }
                 }
