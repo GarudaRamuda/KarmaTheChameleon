@@ -13,10 +13,11 @@ class Play extends Phaser.Scene {
         //load images
         this.load.image('ground', './assets/ground.png');
         this.load.image('chameleon', './assets/chameleon.png');
-        this.load.image('chameleonGrappled', './assets/chameleonGrappled.png');
+        this.load.image('chameleonGrappled', './assets/chameleonGrappled2.png');
         this.load.image('radius', './assets/radius.png');
         this.load.image('seg', './assets/seg.png');
         this.load.image('sky', './assets/sky.png');
+        this.load.plugin('rexrotatetoplugin', './lib/rexrotatetoplugin.min.js' , true); // load plugin for rotate
     }
 
 
@@ -42,6 +43,10 @@ class Play extends Phaser.Scene {
         this.matter.add.mouseSpring();
         this.p1.isGrappled = false;
         // this.matter.add.worldConstraint(this.p1, 100, 1, {pointA: {x:320, y:200},});
+
+        this.p1.rotateTo = this.plugins.get('rexrotatetoplugin').add(this.p1, { // add rotate to p1
+            speed: 500
+        });
     }
 
     update() {

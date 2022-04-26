@@ -86,6 +86,12 @@ class Player extends Phaser.Physics.Matter.Sprite {
         world.on('collisionstart', this.onSensorCollide, this);
         world.on('collisionactive', this.onSensorCollide, this);
 
+        // keep grapple point for rotation
+        this.grapplePointX;
+        this.grapplePointY;
+        this.isMovingLeft = false;
+        this.backflip;
+
         // Grapple logic
         scene.input.on('pointerdown', (pointer, currentlyOver) => {
             if (!this.isGrappled) {
@@ -101,6 +107,12 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
+
+                            // save grapple point
+                            this.grapplePointX = pointer.worldX;
+                            this.grapplePointY = pointer.worldY;
+                            // set backflip
+                            this.backflip = Math.floor(Math.random() * 3);
 
                             // Create a line to find the points along it for spawning bodies
                             let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
@@ -157,6 +169,33 @@ class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     update() {
+
+        // Rotate
+        if (this.scene.p1.body.velocity.x < 0 ) {
+            this.isMovingLeft = true;
+        } else {
+            this.isMovingLeft = false;
+        }       
+        
+        if (this.isGrappled) {
+            this.flipX = false;            
+            this.scene.input.keyboard.removeKey('A'); // stop flipping
+            this.scene.p1.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
+        } else {
+            // rotate back to normal
+            // does keep rotatingd
+            keyA = this.scene.input.keyboard.addKey('A');
+
+            
+            if (this.isMovingLeft) {
+                this.flipX = true;  
+                this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x, this.scene.p1.y, 1);          
+            } else {
+                console.log("Backflip: ", this.backflip);
+                this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x+1, this.scene.p1.y, this.backflip);                     
+            }
+        }
+
         this.radius.x = this.x;
         this.radius.y = this.y;
 
