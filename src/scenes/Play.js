@@ -98,13 +98,21 @@ class Play extends Phaser.Scene {
 
     // Not really a function, but is used to parralax fixed bg's a certain amount
     parallaxBGs() {
+        
+        this.parallaxAmount(this.bg_far);
+        this.parallaxAmount(this.bg_mid, 2.7);
+        this.parallaxAmount(this.bg_close, 2.3);
+    }
+
+    // Function that takes a tilesprite and has it parallax based off of a given amount
+    // Not entirely sure how the offset amount works, but setting it to 2 seems to lock it to the camera
+    parallaxAmount(tileSprite, offsetAmount = 0) {
+        // lock tilesprite to camera
         let worldView = this.cameras.main.worldView;
-        this.bg_far.x = worldView.left;
+        tileSprite.x = worldView.x;
 
-        this.bg_mid.x = worldView.left;
-        this.bg_mid.tilePositionX = worldView.x/2.7;
-
-        this.bg_close.x = worldView.left;
-        this.bg_close.tilePositionX = worldView.x/2.3;
+        //Create parralax amount
+        if(offsetAmount == 0) return null;
+        tileSprite.tilePositionX = worldView.x/offsetAmount;
     }
 }
