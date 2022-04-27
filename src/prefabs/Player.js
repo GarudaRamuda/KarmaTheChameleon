@@ -80,6 +80,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.coyoteTime = 15;
         this.lastGrounded = this.coyoteTime;
 
+        this.ropeJustCreated = false;
+        this.ropeCreatedFrameAgo = false;
+
         // Let player jump even if they press too early before landing
         this.bufferWindow = 16;
         this.jumpBuffer = 0;
@@ -139,20 +142,25 @@ class Player extends Phaser.Physics.Matter.Sprite {
                         let ropeLength = realRopeLength / 1;
 
                         // adjust ropeStep to create more rope segments
-                        let ropeStep = Math.floor(ropeLength/3);
+                        let num_steps = 3;
+                        let ropeStep = ropeLength / num_steps;
 
                         if (realRopeLength <= this.grappleRange) {
                             let prev;
 
+                            //used to debug rope
+                            this.ropeJustCreated = true;
+
                             // save grapple point
                             this.grapplePointX = pointer.worldX;
                             this.grapplePointY = pointer.worldY;
+                            
                             // set backflip
                             this.backflip = Math.floor(Math.random() * 3);
 
                             // Create a line to find the points along it for spawning bodies
                             let line = new Phaser.Geom.Line(pointer.worldX, pointer.worldY, this.x, this.y);
-                            let points = Phaser.Geom.Line.BresenhamPoints(line, ropeStep);
+                            let points = line.getPoints(num_steps, ropeStep);
                             let stiffness = 0.4;
                             let damping = 0.8;
                             this.grappleArray = [];
@@ -182,7 +190,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             }
                             scene.sound.play('sound_stick');
                             this.isGrappled = true;
+
                             this.sprite.anims.play('grapple', true);
+                            this.setVelocityX(0);
+                            this.setVelocityY(0);
                         }
                     }
                 }
@@ -207,6 +218,17 @@ class Player extends Phaser.Physics.Matter.Sprite {
     update() {
         this.sprite.x = this.x;
         this.sprite.y = this.y;
+
+        if(this.ropeCreatedFrameAgo) {
+            // Use this line as a break point to see the rope segments the frame after their creation
+            this.ropeCreatedFrameAgo = false;
+        }
+
+        if(this.ropeJustCreated) {
+            this.ropeJustCreated = false;
+            this.ropeCreatedFrameAgo = true;
+        }
+
         // Rotate
         let isMovingLeft = (this.scene.p1.body.velocity.x < 0 ? true : false);
         
