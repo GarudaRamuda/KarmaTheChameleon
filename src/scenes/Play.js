@@ -11,6 +11,12 @@ class Play extends Phaser.Scene {
         this.load.audio('sound_land', './assets/sounds/land.wav');
 
         //load images
+
+        // background images
+        this.load.image('img_bg_close', './assets/back_close.png');
+        this.load.image('img_bg_mid', './assets/back_mid.png');
+        this.load.image('img_bg_far', './assets/back_far.png');
+
         this.load.atlas('play', './assets/spritesheet.png', './assets/sprites.json', null, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
         this.load.image('ground', './assets/ground.png');
         this.load.image('collision', './assets/collisionmask.png');
