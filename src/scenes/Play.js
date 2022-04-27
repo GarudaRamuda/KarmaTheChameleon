@@ -19,7 +19,7 @@ class Play extends Phaser.Scene {
 
 
     create() {
-        this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0,0).setScale(2);
+        this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
 
         this.p1 = new Player(this, this.matter.world, 562, 400, 'collision'); // do we need setOrigin?
         this.ground = this.matter.add.image(config.width - 700, config.height - 50, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4);
@@ -54,8 +54,9 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-        this.p1.update();
-        //this.sky.titlePositionX -= 16;
+        this.p1.update();   
+        this.sky.x = this.p1.x;
+        this.sky.tilePositionX = this.p1.x/1.5; 
 
         // check if dead
         if (this.p1.y >= config.height) { // touching bottom
