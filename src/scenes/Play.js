@@ -20,11 +20,13 @@ class Play extends Phaser.Scene {
 
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
-
+        this.loopingArray = [];
 
         this.p1 = new Player(this, this.matter.world, 562, config.height/2, 'collision'); // do we need setOrigin?
         this.ground1 = this.matter.add.image(config.width - 100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4);
+        this.loopingArray.push(this.ground1);
         this.ground2 = this.matter.add.image(100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4);
+        this.loopingArray.push(this.ground2);
 
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -54,17 +56,30 @@ class Play extends Phaser.Scene {
         // touching fire
 
         //check if platforms are outside the screen
-        let worldView = this.cameras.main.worldView;
-        let ground2Right = this.ground2.x + this.ground2.width/2;
-        let cameraLeft = worldView.left;
+        this.loopingObjectHandler();
+    }
 
-        if(ground2Right < cameraLeft) {
-            this.ground2.x = worldView.right + this.ground2.width/2;
-        }
+    // Loops through array of objects that must be culled when oustisde left side of screen
+    // Can handle each object in a variety of ways, but will just bring it back to the beginning for the time being
+    loopingObjectHandler() {
+        let camera = this.cameras.main;
+        let worldView = camera.worldView;
+        for(let i = 0; i < this.loopingArray.length; i++) {
+            let object = this.loopingArray[i];
 
-        let ground1Right = this.ground1.x + this.ground1.width/2;
-        if(ground1Right < cameraLeft) {
-            this.ground1.x = worldView.right + this.ground1.width/2;
+            if(!this.isOffLeft(camera, object)) continue;
+
+            object.x = worldView.right + object.width/2;
         }
+    }
+
+
+    // Checks to see if given object is outside view of camera in worldview
+    // pre: objects origin must be in the very middle of the object
+    // post: returns true if object is outside camera view to the left, false otherwise
+    isOffLeft(camera, object) {
+        let worldView = camera.worldView;
+        let objectRight = object.x + object.width/2;
+        return objectRight < worldView.left;  
     }
 }
