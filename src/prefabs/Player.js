@@ -69,7 +69,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
-        this.radius = scene.add.sprite(0, 0, 'play', 'radius').setScale(2);
+        this.radius = scene.add.sprite(0, 0, 'play', 'radius').setScale(2.5);
 
         this.grappleRange = this.radius.displayWidth / 2;
         this.isGrappled = false;
@@ -192,8 +192,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             this.isGrappled = true;
 
                             this.sprite.anims.play('grapple', true);
-                            this.setVelocityX(0);
-                            this.setVelocityY(0);
+                            // this.setVelocityX(0);
+                            // this.setVelocityY(0);
                         }
                     }
                 }
@@ -233,8 +233,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         let isMovingLeft = (this.scene.p1.body.velocity.x < 0 ? true : false);
         
         if (this.isGrappled) {
-            this.sprite.flipX = false;            
-            this.scene.input.keyboard.removeKey('A'); // stop flipping
             this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
         } else {
             // rotate back to normal
@@ -243,7 +241,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
             
             if (isMovingLeft) {
-                this.sprite.flipX = true;  
+                this.sprite.flipX = true;
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x, this.sprite.y, 1);          
             } else {
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x+1, this.sprite.y, this.backflip);                     
@@ -328,6 +326,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         else if (Phaser.Input.Keyboard.JustDown(keyW)) {
             this.jumpBuffer = this.bufferWindow;
         }
+        if (this.isGrappled) this.sprite.flipX = false;
+        console.log(this.sprite.flipX);
     }
 
     rotateAroundPoint() {
