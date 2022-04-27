@@ -21,9 +21,7 @@ class Play extends Phaser.Scene {
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0,0).setScale(2);
 
-        this.matter.world.setBounds();
-
-        this.p1 = new Player(this, this.matter.world, 30, 20, 'collision'); // do we need setOrigin?
+        this.p1 = new Player(this, this.matter.world, config.width/2 , config.height/2, 'collision'); // do we need setOrigin?
         this.ground = this.matter.add.image(config.width/2, config.height - 50, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(2, 4);
         this.ground.setInteractive();
         this.platform = this.matter.add.image(-200, 400, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 2);
@@ -47,6 +45,9 @@ class Play extends Phaser.Scene {
         this.p1.sprite.rotateTo = this.plugins.get('rexrotatetoplugin').add(this.p1.sprite, { // add rotate to p1
             speed: 500
         });
+
+        //create game camera
+        this.cameras.main.startFollow(this.p1, false, 0.04, 0);
     }
 
     update() {
