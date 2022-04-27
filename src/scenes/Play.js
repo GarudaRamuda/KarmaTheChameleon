@@ -22,6 +22,7 @@ class Play extends Phaser.Scene {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
         this.p1 = new Player(this, this.matter.world, 562, config.height/2, 'collision'); // do we need setOrigin?
 
+        //declare looping objects in array
         this.objectArray = [
             this.matter.add.image(100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
             this.matter.add.image(config.width - 100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
@@ -56,7 +57,7 @@ class Play extends Phaser.Scene {
         }
         // touching fire
 
-        //check if platforms are outside the screen
+        //check if platforms are outside the screen and handle the behavior for that
         this.loopingObjectHandler();
     }
 
