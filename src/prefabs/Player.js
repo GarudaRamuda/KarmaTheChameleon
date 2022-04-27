@@ -327,7 +327,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             this.jumpBuffer = this.bufferWindow;
         }
         if (this.isGrappled) this.sprite.flipX = false;
-        console.log(this.sprite.flipX);
+        //console.log(this.sprite.flipX);
     }
 
     rotateAroundPoint() {
