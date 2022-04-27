@@ -26,21 +26,14 @@ class Play extends Phaser.Scene {
 
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
+        this.p1 = new Player(this, this.matter.world, 562, config.height/2, 'collision'); // do we need setOrigin?
 
-
-        this.p1 = new Player(this, this.matter.world, 562, 400, 'collision'); // do we need setOrigin?
-        this.ground = this.matter.add.image(config.width - 700, config.height - 50, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4);
-
-        this.ground.setInteractive();
-        this.platform = this.matter.add.image(-200, 400, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 2);
-        this.platform.setInteractive();
-        this.platform2 = this.matter.add.image(config.width + 100, 300, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 2);
-        this.platform2.setInteractive();
-        this.platform3 = this.matter.add.image(config.width/2, 450, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(0.5, 2);
-        this.platform3.setInteractive();
-
-        this.ceiling = this.matter.add.image(config.width/2, 150, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(0.4, 2.5);
-        this.ceiling.setInteractive();
+        //declare looping objects in array
+        this.objectArray = [
+            this.matter.add.image(100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
+            this.matter.add.image(config.width - 100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
+            this.matter.add.image(config.width - 100, 100, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 1)
+        ];
 
 
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
@@ -54,7 +47,6 @@ class Play extends Phaser.Scene {
             speed: 500
         });
 
-        this.cameras.main.setBounds(0, 0, config.width*2, config.height);        
         this.cameras.main.startFollow(this.p1, false, 0.04, 0);
         this.cameras.main.setBackgroundColor('#000000'); 
        
@@ -70,5 +62,32 @@ class Play extends Phaser.Scene {
             this.scene.start('death');
         }
         // touching fire
+
+        //check if platforms are outside the screen and handle the behavior for that
+        this.loopingObjectHandler();
+    }
+
+    // Loops through array of objects that must be culled when oustisde left side of screen
+    // Can handle each object in a variety of ways, but will just bring it back to the beginning for the time being
+    loopingObjectHandler() {
+        let camera = this.cameras.main;
+        let worldView = camera.worldView;
+        for(let i = 0; i < this.objectArray.length; i++) {
+            let object = this.objectArray[i];
+
+            if(!this.isOffLeft(camera, object)) continue;
+
+            object.x = worldView.right + object.width/2;
+        }
+    }
+
+
+    // Checks to see if given object is outside view of camera in worldview
+    // pre: objects origin must be in the very middle of the object
+    // post: returns true if object is outside camera view to the left, false otherwise
+    isOffLeft(camera, object) {
+        let worldView = camera.worldView;
+        let objectRight = object.x + object.width/2;
+        return objectRight < worldView.left;  
     }
 }
