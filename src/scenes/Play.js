@@ -26,6 +26,10 @@ class Play extends Phaser.Scene {
 
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
+        this.bg_far = this.add.tileSprite(0,0, 512, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
+        this.bg_mid = this.add.tileSprite(0,0, 512, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
+        this.bg_close = this.add.tileSprite(0,0, 512, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
+
         this.p1 = new Player(this, this.matter.world, 562, config.height/2, 'collision'); // do we need setOrigin?
 
         //declare looping objects in array
@@ -65,6 +69,7 @@ class Play extends Phaser.Scene {
 
         //check if platforms are outside the screen and handle the behavior for that
         this.loopingObjectHandler();
+        this.parallaxBGs();
     }
 
     // Loops through array of objects that must be culled when oustisde left side of screen
@@ -89,5 +94,17 @@ class Play extends Phaser.Scene {
         let worldView = camera.worldView;
         let objectRight = object.x + object.width/2;
         return objectRight < worldView.left;  
+    }
+
+    // Not really a function, but is used to parralax fixed bg's a certain amount
+    parallaxBGs() {
+        let worldView = this.cameras.main.worldView;
+        this.bg_far.x = worldView.left;
+
+        this.bg_mid.x = worldView.left;
+        this.bg_mid.tilePositionX = worldView.x/2.7;
+
+        this.bg_close.x = worldView.left;
+        this.bg_close.tilePositionX = worldView.x/2.3;
     }
 }
