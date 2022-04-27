@@ -7,8 +7,45 @@ class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, world, x, y, texture, frame, options) {
         super (world, 0, 0, texture, frame, options);
         scene.add.existing(this);
-        //global
+        // global
         this.scene = scene;
+        
+        // hide collision
+        this.setAlpha(0);
+
+        // actual displayed sprite
+        this.sprite = scene.add.sprite(0, 0, 'play', 'chameleonWalk_01').setScale(2);
+        // render the player on top
+        this.sprite.depth = 1;
+
+        // sprite animations
+        this.sprite.anims.create({
+            key: 'walk', 
+            frames: this.sprite.anims.generateFrameNames('play', {
+                start: 1, end: 2, zeroPad: 2,
+                prefix: 'chameleonWalk_',
+                }), 
+            duration: 500,
+            delayRepeat: 500,
+            repeat: -1
+        });
+
+        this.sprite.anims.create({
+            key: 'idle', 
+            frames: this.sprite.anims.generateFrameNames('play', {
+                start: 1, end: 1, zeroPad: 2,
+                prefix: 'chameleonWalk_',
+            }),
+        });
+
+        this.sprite.anims.create({
+            key: 'grapple',
+            frames: this.sprite.anims.generateFrameNames('play', {
+                start:1, end: 1, zeroPad: 2,
+                prefix: 'chameleonGrapple_'
+            })
+        });
+
 
         // Set up player movement params
         this.groundForce = 0.045;
@@ -32,9 +69,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
-        this.radius = scene.add.sprite(0, 0, 'radius');
+        this.radius = scene.add.sprite(0, 0, 'play', 'radius').setScale(2);
 
-        this.grappleRange = this.radius.width / 2;
+        this.grappleRange = this.radius.displayWidth / 2;
         this.isGrappled = false;
         this.outOfGrapple = false;
         this.grappleArray = null;
@@ -92,7 +129,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // keep grapple point for rotation
         this.grapplePointX;
         this.grapplePointY;
-        this.isMovingLeft = false;
         this.backflip;
 
         // Grapple logic
@@ -131,7 +167,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             this.bodyArray = [];
                             // Generate an array of segments to form our rope
                             for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
-                                let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'seg', null, {shape: 'circle', mass:0.1});
+                                let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'play', 'seg', {shape: 'circle', mass:0.1}).setScale(2);
                                 this.bodyArray.push(seg);
 
                                 // First segment binds to a point in the world
@@ -154,7 +190,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             }
                             scene.sound.play('sound_stick');
                             this.isGrappled = true;
-                            this.setTexture('chameleonGrappled');
+
+                            this.sprite.anims.play('grapple', true);
                             this.setVelocityX(0);
                             this.setVelocityY(0);
                         }
@@ -171,7 +208,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 }
                 this.scene.matter.world.remove(this.bodyArray);
                 this.isGrappled = false;
-                this.setTexture('chameleon');
+                this.sprite.anims.play('idle', true);
                 this.canBoost = true;
                 this.outOfGrapple = true;
             }
@@ -179,6 +216,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     update() {
+        this.sprite.x = this.x;
+        this.sprite.y = this.y;
 
         if(this.ropeCreatedFrameAgo) {
             // Use this line as a break point to see the rope segments the frame after their creation
@@ -191,27 +230,23 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }
 
         // Rotate
-        if (this.scene.p1.body.velocity.x < 0 ) {
-            this.isMovingLeft = true;
-        } else {
-            this.isMovingLeft = false;
-        }       
+        let isMovingLeft = (this.scene.p1.body.velocity.x < 0 ? true : false);
         
         if (this.isGrappled) {
-            this.flipX = false;            
+            this.sprite.flipX = false;            
             this.scene.input.keyboard.removeKey('A'); // stop flipping
-            this.scene.p1.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
+            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
         } else {
             // rotate back to normal
             // does keep rotatingd
             keyA = this.scene.input.keyboard.addKey('A');
 
             
-            if (this.isMovingLeft) {
-                this.flipX = true;  
-                this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x, this.scene.p1.y, 1);          
+            if (isMovingLeft) {
+                this.sprite.flipX = true;  
+                this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x, this.sprite.y, 1);          
             } else {
-                this.scene.p1.rotateTo.rotateTowardsPosition(this.scene.p1.x+1, this.scene.p1.y, this.backflip);                     
+                this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x+1, this.sprite.y, this.backflip);                     
             }
         }
 
@@ -253,7 +288,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }
 
         if(keyA.isDown) {
-            if (!this.flipX) this.flipX = true;
+            if (!this.sprite.flipX) this.sprite.flipX = true;
+            if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
+            else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             if (this.isGrappled) { 
                 this.applyForce({x: -this.grappleForce, y:0});
             }
@@ -265,7 +302,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
         if(keyD.isDown) {
-            if (this.flipX) this.flipX = false;
+            if (this.sprite.flipX) this.sprite.flipX = false;
+            if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
+            else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             // Apply smaller force on a grapple
             if (this.isGrappled){
                 this.applyForce({x: this.grappleForce, y:0});
@@ -278,6 +317,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
             }
         }
+
+        if (!keyA.isDown && !keyD.isDown && !this.isGrappled) this.sprite.anims.play('idle', true);
         if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
             this.lastGrounded = 0;
@@ -322,11 +363,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 if (otherBody.isSensor) return; // don't need collisions with nonphysical objects
                 if (playerBody === this.sensors.left) {
                     this.isTouching.left = true;
-                    if (pairs.separation > 0.5) this.sprite.x += pairs.separation + 2; // nudge the main body away from the wall to avoid friction
+                    // TODO: Nudge main body away from walls based on the depth of collision. Difficulties accessing the members atm
                 }
                 else if (playerBody === this.sensors.right) {
                     this.isTouching.right = true;
-                    if (pairs.separation > 0.5) this.sprite.x -= pairs.separation + 2;
                 }
                 else if (playerBody === this.sensors.bottom) {
                     this.isTouching.bottom = true;
