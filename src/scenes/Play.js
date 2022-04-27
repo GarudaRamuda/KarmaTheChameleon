@@ -56,8 +56,8 @@ class Play extends Phaser.Scene {
 
     update() {
         this.p1.update();   
-        this.sky.x = this.p1.x;
-        this.sky.tilePositionX = this.p1.x/1.5; 
+        this.sky.x = this.cameras.main.worldView.x;
+        this.sky.tilePositionX = Math.floor(this.cameras.main.worldView.x/2.7); 
 
         // check if dead
         if (this.p1.y >= config.height) { // touching bottom
