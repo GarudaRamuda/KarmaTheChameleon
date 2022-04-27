@@ -7,11 +7,45 @@ class Player extends Phaser.Physics.Matter.Sprite {
     constructor(scene, world, x, y, texture, frame, options) {
         super (world, 0, 0, texture, frame, options);
         scene.add.existing(this);
-        //global
-        this.setScale(2);
+        // global
         this.scene = scene;
+        
+        // hide collision
         this.setAlpha(0);
-        this.sprite = scene.add.sprite(0, 0, 'play', 'chameleonWalk1').setScale(2);
+
+        // actual displayed sprite
+        this.sprite = scene.add.sprite(0, 0, 'play', 'chameleonWalk_01').setScale(2);
+        // render the player on top
+        this.sprite.depth = 1;
+
+        // sprite animations
+        this.sprite.anims.create({
+            key: 'walk', 
+            frames: this.sprite.anims.generateFrameNames('play', {
+                start: 1, end: 2, zeroPad: 2,
+                prefix: 'chameleonWalk_',
+                }), 
+            duration: 500,
+            delayRepeat: 500,
+            repeat: -1
+        });
+
+        this.sprite.anims.create({
+            key: 'idle', 
+            frames: this.sprite.anims.generateFrameNames('play', {
+                start: 1, end: 1, zeroPad: 2,
+                prefix: 'chameleonWalk_',
+            }),
+        });
+
+        this.sprite.anims.create({
+            key: 'grapple',
+            frames: this.sprite.anims.generateFrameNames('play', {
+                start:1, end: 1, zeroPad: 2,
+                prefix: 'chameleonGrapple_'
+            })
+        });
+
 
         // Set up player movement params
         this.groundForce = 0.045;
@@ -92,7 +126,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // keep grapple point for rotation
         this.grapplePointX;
         this.grapplePointY;
-        this.isMovingLeft = false;
         this.backflip;
 
         // Grapple logic
@@ -149,7 +182,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                             }
                             scene.sound.play('sound_stick');
                             this.isGrappled = true;
-                            this.sprite.setFrame('chameleonGrapple');
+                            this.sprite.anims.play('grapple', true);
                         }
                     }
                 }
@@ -164,7 +197,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 }
                 this.scene.matter.world.remove(this.bodyArray);
                 this.isGrappled = false;
-                this.sprite.setFrame('chameleonWalk1');
+                this.sprite.anims.play('idle', true);
                 this.canBoost = true;
                 this.outOfGrapple = true;
             }
@@ -175,11 +208,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.sprite.x = this.x;
         this.sprite.y = this.y;
         // Rotate
-        if (this.scene.p1.body.velocity.x < 0 ) {
-            this.isMovingLeft = true;
-        } else {
-            this.isMovingLeft = false;
-        }       
+        let isMovingLeft = (this.scene.p1.body.velocity.x < 0 ? true : false);
         
         if (this.isGrappled) {
             this.sprite.flipX = false;            
@@ -191,7 +220,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             keyA = this.scene.input.keyboard.addKey('A');
 
             
-            if (this.isMovingLeft) {
+            if (isMovingLeft) {
                 this.sprite.flipX = true;  
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x, this.sprite.y, 1);          
             } else {
@@ -238,6 +267,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         if(keyA.isDown) {
             if (!this.sprite.flipX) this.sprite.flipX = true;
+            if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
+            else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             if (this.isGrappled) { 
                 this.applyForce({x: -this.grappleForce, y:0});
             }
@@ -250,6 +281,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }
         if(keyD.isDown) {
             if (this.sprite.flipX) this.sprite.flipX = false;
+            if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
+            else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             // Apply smaller force on a grapple
             if (this.isGrappled){
                 this.applyForce({x: this.grappleForce, y:0});
@@ -262,6 +295,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 if (velocity.x > this.groundSpeedCap) this.setVelocityX(this.groundSpeedCap);
             }
         }
+
+        if (!keyA.isDown && !keyD.isDown && !this.isGrappled) this.sprite.anims.play('idle', true);
         if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
             this.setVelocityY(-this.jumpHeight); // move up y-axis
             this.lastGrounded = 0;
