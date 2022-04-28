@@ -81,9 +81,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // arrays to manage bodies and constraints in a grapple
         this.grappleArray = null;
         this.bodyArray = null;
-        // Whenever player is grounded, set lastGrounded; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
+        // Whenever player is grounded, set lastGrounded to coyoteTime; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
-        this.lastGrounded = this.coyoteTime;
+        this.lastGrounded = 0;
 
         this.ropeJustCreated = false;
         this.ropeCreatedFrameAgo = false;
