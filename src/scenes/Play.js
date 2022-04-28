@@ -36,16 +36,14 @@ class Play extends Phaser.Scene {
         this.objectArray = [
             this.matter.add.image(100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
             this.matter.add.image(config.width - 100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
-            this.matter.add.image(config.width - 100, 100, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 1)
+            this.matter.add.image(config.width - 100, 360, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 1),
         ];
 
 
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W); // fix later
-        this.matter.add.mouseSpring();
-        this.p1.isGrappled = false;
-        // this.matter.add.worldConstraint(this.p1, 100, 1, {pointA: {x:320, y:200},});
+        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.p1.sprite.rotateTo = this.plugins.get('rexrotatetoplugin').add(this.p1.sprite, { // add rotate to p1
             speed: 500

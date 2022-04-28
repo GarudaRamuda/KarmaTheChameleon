@@ -8,7 +8,9 @@ let config = {
             gravity: {
                 y: 1.5
             },
-            debug: true,
+            debug: {
+                showBody:true,
+            }
         }
     },
     pixelArt: true,
@@ -20,5 +22,5 @@ let config = {
 };
 
 let game = new Phaser.Game(config);
-let pointer, keyA, keyD, keyW;
+let pointer, keyA, keyD, keyW, keySPACE;
 game.maxHeight = 0;
