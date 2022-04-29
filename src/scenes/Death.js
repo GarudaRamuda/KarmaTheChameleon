@@ -9,11 +9,10 @@ class Death extends Phaser.Scene {
 
     create () {
         let menuConfig = {
-            fontFamily: 'Courier',
-            fontSize: '28px',
-            backgroundColor: '#1fbbcf',
-            color: '#ffffff',
-            align: 'right',
+            fontFamily: 'stockyPixels',
+            fontSize: '16px',
+            color: '#fa0251',
+            align: 'center',
             padding: {
                 top: 5,
                 bottom: 5,
@@ -21,21 +20,13 @@ class Death extends Phaser.Scene {
             fixedWidth: 0
         }
 
-        this.death = this.add.tileSprite(0,0, config.width, config.height, 'death_image', ).setOrigin(0,0).setScale(2);        
-        this.add.text(game.config.width/2, game.config.height - 15, 'R to restart or M for menu', menuConfig).setOrigin(0.5);
-        
-        this.keyR = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
-        this.keyM = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.M);
+        this.add.tileSprite(0,0, config.width, config.height, 'death_image', ).setOrigin(0,0).setScale(2);
+        let button1Pad = 276 * 2;
+        let button1 = this.add.image(game.config.width/2, button1Pad, 'button').setOrigin(0.5, 0.5).setScale(2);
+        button1.setInteractive();
+        this.add.text(game.config.width/2, button1.y + 2, 'MENU', menuConfig).setOrigin(0.5);
+        button1.on('pointerdown', () => {
+            this.scene.start('menu');
+        });
     }
-
-    update () {
-        
-        if (Phaser.Input.Keyboard.JustDown(this.keyR)) {                        
-            this.scene.start('play');    
-        }
-        if (Phaser.Input.Keyboard.JustDown(this.keyM)) {            
-            this.scene.start('menu');                        
-        }
-    }
-    
 }
