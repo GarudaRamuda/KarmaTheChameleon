@@ -5,10 +5,10 @@ class Play extends Phaser.Scene {
 
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
-        this.bg_far = this.add.tileSprite(0,0, 512, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
-        this.bg_mid2 = this.add.tileSprite(0,0, 512, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
-        this.bg_mid = this.add.tileSprite(0,0, 512, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
-        this.bg_close = this.add.tileSprite(0,0, 512, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
+        this.bg_far = this.add.tileSprite(0,0, 528, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
+        this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
+        this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
+        this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
 
         this.p1 = new Player(this, this.matter.world, 562, config.height/2, 'collision'); // do we need setOrigin?
 
@@ -30,7 +30,7 @@ class Play extends Phaser.Scene {
         });
 
         this.cameras.main.startFollow(this.p1, false, 0.04, 0);
-        this.cameras.main.setBackgroundColor('#000000'); 
+        this.cameras.main.setBackgroundColor('#abefbd'); 
        
     }
 
