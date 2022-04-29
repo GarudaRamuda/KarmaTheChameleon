@@ -17,12 +17,19 @@
             display: block;
             width: 1024px;
         }
+
+        @font-face {
+            font-family: stockyPixels;
+            src: url('./assets/stockyPixels.ttf');
+        }
     </style>
+    <div style="font-family:stockyPixels; position: absolute; left:-1000px; visibility:hidden;">.</div>
     <script src="./lib/phaser.js"></script>
     <script src="./src/prefabs/Player.js"></script>
     <script src="./src/scenes/Play.js"></script>
     <script src="./src/scenes/Death.js"></script>
     <script src="./src/scenes/Menu.js"></script>
+    <script src="./src/scenes/Load.js"></script>
     <script src="./src/Main.js"></script>
 </head>
 <body>

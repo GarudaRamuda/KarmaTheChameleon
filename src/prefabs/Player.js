@@ -70,7 +70,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.isTouching = {left: false, right: false, bottom: false};
 
         // Collision mask for grapplable objects in range of player
-        this.grappleRect = scene.matter.add.image(0, 0, 'collision', null, { isSensor: true, ignoreGravity: true, label: 'grappleRange'});
+        this.grappleRect = scene.matter.add.image(0, 0, 'grappleMask', null, { isSensor: true, ignoreGravity: true,});
         this.grappleRect.setAlpha(0);
         this.grappleRect.setIgnoreGravity(true);
         this.isGrappled = false;

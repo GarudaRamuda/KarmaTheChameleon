@@ -3,30 +3,10 @@ class Play extends Phaser.Scene {
         super("play");
     }
 
-    preload() {
-
-        //load sounds
-        this.load.audio('sound_stick', './assets/sounds/stick.wav');
-        this.load.audio('sound_jump', './assets/sounds/jump.wav');
-        this.load.audio('sound_land', './assets/sounds/land.wav');
-
-        //load images
-
-        // background images
-        this.load.image('img_bg_close', './assets/back_close.png');
-        this.load.image('img_bg_mid', './assets/back_mid.png');
-        this.load.image('img_bg_far', './assets/back_far.png');
-
-        this.load.atlas('play', './assets/spritesheet.png', './assets/sprites.json', null, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
-        this.load.image('ground', './assets/ground.png');
-        this.load.image('collision', './assets/collisionmask.png');
-        this.load.plugin('rexrotatetoplugin', './lib/rexrotatetoplugin.min.js' , true); // load plugin for rotate
-    }
-
-
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
         this.bg_far = this.add.tileSprite(0,0, 512, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
+        this.bg_mid2 = this.add.tileSprite(0,0, 512, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 512, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 512, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
 
@@ -36,7 +16,7 @@ class Play extends Phaser.Scene {
         this.objectArray = [
             this.matter.add.image(100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
             this.matter.add.image(config.width - 100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
-            this.matter.add.image(config.width - 100, 360, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 1),
+            this.matter.add.image(config.width - 100, 260, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 1),
         ];
 
 
@@ -98,6 +78,7 @@ class Play extends Phaser.Scene {
     parallaxBGs() {
         
         this.parallaxAmount(this.bg_far);
+        this.parallaxAmount(this.bg_mid2, 3.3);
         this.parallaxAmount(this.bg_mid, 2.7);
         this.parallaxAmount(this.bg_close, 2.3);
     }

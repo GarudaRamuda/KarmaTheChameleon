@@ -3,33 +3,34 @@ class Menu extends Phaser.Scene {
         super("menu");
     }
 
-    preload() {        
-        this.load.image('menu', './assets/menu.png');
-    }
-
     create () {
         let menuConfig = {
-            fontFamily: 'Courier',
-            fontSize: '28px',
-            backgroundColor: '#1fbbcf',
-            color: '#ffffff',
-            align: 'right',
+            fontFamily: 'stockyPixels',
+            fontSize: '16px',
+            color: '#f5ffe8',
+            align: 'center',
             padding: {
                 top: 5,
                 bottom: 5,
             },
             fixedWidth: 0
         }
-
-        this.death = this.add.tileSprite(0,0, config.width, config.height, 'menu', ).setOrigin(0,0).setScale(2);        
-        this.add.text(game.config.width/2, game.config.height - 15, 'S to start', menuConfig).setOrigin(0.5);
+        let button1Pad = 234 * 2;
+        let button2Pad = button1Pad + (32 * 2);
+        this.add.tileSprite(0,0, config.width, config.height, 'menu', ).setOrigin(0,0).setScale(2);    
+        let button1 = this.add.image(game.config.width/2, button1Pad, 'button').setOrigin(0.5, 0.5).setScale(2);
+        let button2 = this.add.image(game.config.width/2, button2Pad, 'button').setOrigin(0.5, 0.5).setScale(2);   
+        button1.setInteractive();
+        button2.setInteractive();
+        this.add.text(game.config.width/2, button1.y + 2, 'PLAY!', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, button2.y + 2, 'QUIT', menuConfig).setOrigin(0.5);
         
-        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-    }
+        button1.on('pointerdown', () => {
+            this.scene.start('play');
+        });
 
-    update () {        
-        if (Phaser.Input.Keyboard.JustDown(this.keyS)) {                        
-            this.scene.start('play');    
-          }        
-    }    
+        button2.on('pointerdown', () => {
+            game.destroy(true);
+        });
+    }
 }
