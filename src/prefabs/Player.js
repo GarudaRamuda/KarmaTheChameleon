@@ -66,6 +66,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 
+        this.maxVelocityX = 4;
+
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
 
@@ -256,6 +258,14 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         /* END INPUT HANDLING */
         if (this.isGrappled) this.sprite.flipX = false;
+        this.dragHandler();
+    }
+
+    dragHandler() {
+        if(this.body.velocity.x < this.maxVelocityX) return null;
+        let drag = 0.00003;
+        console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
+        this.applyForce({x:-drag, y: 0});
     }
 
     rotateAroundPoint() {
