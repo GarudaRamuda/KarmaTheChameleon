@@ -10,13 +10,14 @@ class Play extends Phaser.Scene {
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
 
-        this.p1 = new Player(this, this.matter.world, 562, config.height/2, 'collision'); // do we need setOrigin?
+        this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
         //declare looping objects in array
         this.objectArray = [
-            this.matter.add.image(100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
-            this.matter.add.image(config.width - 100, config.height, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 4),
-            this.matter.add.image(config.width - 100, 260, 'ground', null, { restitution: 0.4, isStatic: true, label: "grapplable" }).setScale(1, 1),
+            this.matter.add.image(100, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4),
+            this.matter.add.image(config.width, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4),
+            this.matter.add.image(600, 260, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
+            this.matter.add.image(config.width + 500, 260, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
         ];
 
 
