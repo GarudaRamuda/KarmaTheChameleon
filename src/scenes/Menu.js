@@ -3,10 +3,6 @@ class Menu extends Phaser.Scene {
         super("menu");
     }
 
-    preload() {        
-        
-    }
-
     create () {
         let menuConfig = {
             fontFamily: 'stockyPixels',

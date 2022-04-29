@@ -3,12 +3,6 @@ class Play extends Phaser.Scene {
         super("play");
     }
 
-    preload() {
-
-        
-    }
-
-
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
         this.bg_far = this.add.tileSprite(0,0, 512, 288, 'img_bg_far').setOrigin(0,0).setScale(2);

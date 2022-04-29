@@ -3,9 +3,6 @@ class Death extends Phaser.Scene {
         super("death");
     }
 
-    preload() {        
-    }
-
     create () {
         let menuConfig = {
             fontFamily: 'stockyPixels',
