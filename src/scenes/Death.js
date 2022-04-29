@@ -4,7 +4,6 @@ class Death extends Phaser.Scene {
     }
 
     preload() {        
-        this.load.image('death_image', './assets/death.png');
     }
 
     create () {

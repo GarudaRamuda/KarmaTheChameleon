@@ -6,7 +6,7 @@ class Load extends Phaser.Scene {
     preload() {
         this.load.image('menu', './assets/menu.png');
         this.load.image('button', './assets/button.png');
-
+        this.load.image('death_image', './assets/death.png');
         //load sounds
         this.load.audio('sound_stick', './assets/sounds/stick.wav');
         this.load.audio('sound_jump', './assets/sounds/jump.wav');
