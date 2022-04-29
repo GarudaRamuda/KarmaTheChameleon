@@ -17,6 +17,7 @@ class Load extends Phaser.Scene {
         // background images
         this.load.image('img_bg_close', './assets/back_close.png');
         this.load.image('img_bg_mid', './assets/back_mid.png');
+        this.load.image('img_bg_mid2', './assets/back_mid2.png');
         this.load.image('img_bg_far', './assets/back_far.png');
 
         this.load.atlas('play', './assets/spritesheet.png', './assets/sprites.json', null, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);

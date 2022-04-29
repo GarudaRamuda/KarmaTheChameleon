@@ -6,6 +6,7 @@ class Play extends Phaser.Scene {
     create() {
         this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
         this.bg_far = this.add.tileSprite(0,0, 512, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
+        this.bg_mid2 = this.add.tileSprite(0,0, 512, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 512, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 512, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
 
@@ -77,6 +78,7 @@ class Play extends Phaser.Scene {
     parallaxBGs() {
         
         this.parallaxAmount(this.bg_far);
+        this.parallaxAmount(this.bg_mid2, 3.3);
         this.parallaxAmount(this.bg_mid, 2.7);
         this.parallaxAmount(this.bg_close, 2.3);
     }
