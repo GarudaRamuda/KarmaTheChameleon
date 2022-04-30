@@ -6,6 +6,7 @@ class Tongue {
         this.animDone = false;
         this.sizeX = 1;
         this.sizeY = 8;
+        this.distance = 0;
         this.sprite = scene.add.image(10, 10, texture, null).setScale(this.sizeX, this.sizeY).setOrigin(0, 0.5);
         this.sprite.setVisible(false);
     }
@@ -14,26 +15,33 @@ class Tongue {
         this.sprite.setPosition(player.x, player.y);
     }
 
-    launch(distance) {
+    launch() {
         this.setVisibility(true);
         this.animStarted = true;
-        if(!this.attatched) this.scene.tweens.add ({
+        if(!this.attatched) this.tongue_tween = this.scene.tweens.add ({
             targets: this.sprite,
-            scaleX: {from: 0, to: distance},
-            ease: 'Expo.easeIn',
-            duration: 100,
+            scaleX: {
+                from: 0, 
+                to: {value: () => {return this.distance}},
+            },
+            ease: 'Quad.easeIn',
+            duration: 200,
             repeat: 0,
-            onStart: function () {this.animPlaying = true;},
-            onComplete: function () {this.animDone = true;},
+            onStart: () => {this.animPlaying = true;},
+            onComplete: () => {
+                this.animDone = true;
+            },
         });
     }
 
     attatchTo(point) {
         let angle = Phaser.Math.Angle.BetweenPoints(this.sprite, point);
-        let distance = Phaser.Math.Distance.BetweenPoints(this.sprite, point);
-        if(!this.animStarted) this.launch(distance);
+        this.distance = Phaser.Math.Distance.BetweenPoints(this.sprite, point);
         this.sprite.setRotation(angle);
-        if(this.animDone) this.sprite.setScale(distance, this.sizeY);
+        if(!this.animStarted) this.launch();
+        if(this.animDone) {
+            this.sprite.setScale(this.distance, this.sizeY);
+        }
     }
 
     detach() {
