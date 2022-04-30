@@ -8,9 +8,6 @@ let config = {
             gravity: {
                 y: 1.5
             },
-            debug: {
-                showBody:true,
-            }
         }
     },
     pixelArt: true,
