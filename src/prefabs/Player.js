@@ -148,8 +148,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleRect.x = (this.sprite.flipX ? this.x - this.grappleRect.width/2:this.x + this.grappleRect.width/2);
         this.grappleRect.y = this.y - this.grappleRect.height/2;
 
-        if (!keySPACE.isDown) {
+        if (!keySPACE.isDown && this.isGrappled) {
             this.ungrapple();
+            this.scene.tongue.detach();
         }
 
         if(this.ropeCreatedFrameAgo) {
@@ -166,11 +167,12 @@ class Player extends Phaser.Physics.Matter.Sprite {
         let isMovingLeft = (this.scene.p1.body.velocity.x < 0 ? true : false);
         
         if (this.isGrappled) {
-            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
+            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);
+            this.scene.tongue.attatchTo({x: this.grapplePointX, y: this.grapplePointY});                        
         } else {
             // rotate back to normal
             if (isMovingLeft) {
-                this.sprite.flipX = true;
+                //this.sprite.flipX = true;
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x, this.sprite.y, 1);          
             } else {
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x+1, this.sprite.y, this.backflip);                     
@@ -212,7 +214,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         /* BEGIN INPUT HANDLING */
         if(keyA.isDown) {
-            if (!this.sprite.flipX) this.sprite.flipX = true;
+            //if (!this.sprite.flipX) this.sprite.flipX = true;
             if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
             else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             if (this.isGrappled) { 
@@ -226,7 +228,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
         if(keyD.isDown) {
-            if (this.sprite.flipX) this.sprite.flipX = false;
+            //if (this.sprite.flipX) this.sprite.flipX = false;
             if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
             else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             // Apply smaller force on a grapple
