@@ -66,7 +66,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 
-        this.maxVelocityX = 10;
+        this.maxVelocityX = 7;
         this.dragForce = 0.003;
 
         // Track when sensors are touching something
@@ -263,7 +263,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     dragHandler() {
-        if(this.body.velocity.x < this.maxVelocityX) return null;
+        if(this.body.velocity.x < this.maxVelocityX || this.isGrappled) return null;
         let drag = this.dragForce;
         console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
         this.applyForce({x:-drag, y: 0});
