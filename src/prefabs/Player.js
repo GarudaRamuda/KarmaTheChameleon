@@ -11,7 +11,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.scene = scene;
         
         // hide collision
-        this.setAlpha(0);
+        this.visible = false;
 
         // actual displayed sprite
         this.sprite = scene.add.sprite(0, 0, 'play', 'chameleonWalk_01').setScale(2);
@@ -363,7 +363,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     this.bodyArray = [];
                     // Generate an array of segments to form our rope
                     for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
+
                         let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'play', 'seg', {shape: 'circle', mass:0.1}).setScale(2).setVisible(false);
+
                         this.bodyArray.push(seg);
 
                         // First segment binds to a point in the world
@@ -399,9 +401,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
     ungrapple() {
         if (this.isGrappled) {
             this.scene.matter.world.removeConstraint(this.grappleArray);
-            for (let i = 0; i < this.bodyArray.length; i++) {
-                this.bodyArray[i].visible = false;
-            }
             this.scene.matter.world.remove(this.bodyArray);
             this.isGrappled = false;
             this.sprite.anims.play('idle', true);
