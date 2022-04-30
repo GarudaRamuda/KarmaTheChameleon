@@ -166,7 +166,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         let isMovingLeft = (this.scene.p1.body.velocity.x < 0 ? true : false);
         
         if (this.isGrappled) {
-            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
+            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);
+            this.scene.tongue.attatchTo({x: this.grapplePointX, y: this.grapplePointY});                        
         } else {
             // rotate back to normal
             if (isMovingLeft) {

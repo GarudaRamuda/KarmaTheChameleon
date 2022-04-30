@@ -6,14 +6,15 @@ class Tongue {
         this.sprite = scene.add.image(10, 10, texture, null).setScale(this.sizeX, this.sizeY).setOrigin(0, 0.5);
         this.attatched = false;
     }
-    
+
     track(player) {
         this.sprite.setPosition(player.x, player.y);
     }
 
     attatchTo(point) {
         let angle = Phaser.Math.Angle.BetweenPoints(this.sprite, point);
-        console.log(angle);
+        let distance = Phaser.Math.Distance.BetweenPoints(this.sprite, point);
         this.sprite.setRotation(angle);
+        this.sprite.setScale(distance, this.sizeY);
     }
 };
