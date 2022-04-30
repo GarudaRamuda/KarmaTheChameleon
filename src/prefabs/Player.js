@@ -170,7 +170,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         } else {
             // rotate back to normal
             if (isMovingLeft) {
-                this.sprite.flipX = true;
+                //this.sprite.flipX = true;
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x, this.sprite.y, 1);          
             } else {
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x+1, this.sprite.y, this.backflip);                     
@@ -212,7 +212,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         /* BEGIN INPUT HANDLING */
         if(keyA.isDown) {
-            if (!this.sprite.flipX) this.sprite.flipX = true;
+            //if (!this.sprite.flipX) this.sprite.flipX = true;
             if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
             else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             if (this.isGrappled) { 
@@ -226,7 +226,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
         if(keyD.isDown) {
-            if (this.sprite.flipX) this.sprite.flipX = false;
+            //if (this.sprite.flipX) this.sprite.flipX = false;
             if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
             else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             // Apply smaller force on a grapple
