@@ -363,7 +363,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     this.bodyArray = [];
                     // Generate an array of segments to form our rope
                     for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
-                        let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'play', 'seg', {shape: 'circle', mass:0.1}).setScale(2);
+                        let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'play', 'seg', {shape: 'circle', mass:0.1}).setScale(2).setVisible(false);
                         this.bodyArray.push(seg);
 
                         // First segment binds to a point in the world
@@ -389,8 +389,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
                     this.sprite.anims.play('grapple', true);
                     break;
-                    // this.setVelocityX(0);
-                    // this.setVelocityY(0);
+                    this.setVelocityX(0);
+                    this.setVelocityY(0);
                 }
             }
         }
