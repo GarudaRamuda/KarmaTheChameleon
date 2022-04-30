@@ -28,15 +28,19 @@ class Menu extends Phaser.Scene {
         // Change Alpha on buttons
         button1.on('pointerover', () => {
             button1.alpha = 0.5;
+            button1.setScale(2.2);
         });
         button1.on('pointerout', () => {
             button1.alpha = 1;
+            button1.setScale(2);
         });
         button2.on('pointerover', () => {
             button2.alpha = 0.5;
+            button2.setScale(2.2);
         });
         button2.on('pointerout', () => {
             button2.alpha = 1;
+            button2.setScale(2);
         });
 
         // Got to Play scene
