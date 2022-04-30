@@ -54,7 +54,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleForce = .0007;
         this.grapplePush = 0.003;
 
-        this.jumpHeight = 9;
+        this.jumpHeight = 11;
         
         //Apex Floating Variables
         this.maxUpwardForce = 0.003;
@@ -66,7 +66,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 
-        this.maxVelocityX = 4;
+        this.maxVelocityX = 7;
+        this.dragForce = 0.003;
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
@@ -146,10 +147,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // bind the grapple range; it may flip to the wrong position while grappled, but this doesn't matter in gameplay
         this.grappleRect.x = (this.sprite.flipX ? this.x - this.grappleRect.width/2:this.x + this.grappleRect.width/2);
         this.grappleRect.y = this.y - this.grappleRect.height/2;
-
-        if(Phaser.Input.Keyboard.JustDown(keySPACE)) {
-            this.grapple();
-        }
 
         if (!keySPACE.isDown) {
             this.ungrapple();
@@ -246,14 +243,24 @@ class Player extends Phaser.Physics.Matter.Sprite {
         }
 
         if (!keyA.isDown && !keyD.isDown && !this.isGrappled) this.sprite.anims.play('idle', true);
-        if((Phaser.Input.Keyboard.JustDown(keyW) || this.jumpBuffer > 0) && this.lastGrounded > 0) {
-            this.setVelocityY(-this.jumpHeight); // move up y-axis
-            this.lastGrounded = 0;
-            this.scene.sound.play('sound_jump');
-            this.groundSoundPlayed = false;
-        }
-        else if (Phaser.Input.Keyboard.JustDown(keyW)) {
-            this.jumpBuffer = this.bufferWindow;
+        if(Phaser.Input.Keyboard.JustDown(keySPACE) || this.jumpBuffer > 0) {
+            //console.log(`Space pressed`)
+           // console.log(`Jump buffer: ${this.jumpBuffer}, Last grounded: ${this.lastGrounded}`)
+            if (this.lastGrounded > 0) {
+                //console.log(`Jumping`)
+                this.setVelocityY(-this.jumpHeight); // move up y-axis
+                this.lastGrounded = 0;
+                this.scene.sound.play('sound_jump');
+                this.groundSoundPlayed = false;
+            }
+            else if (this.lastGrounded < 0) {
+                //console.log(`Grappling`)
+                this.grapple();
+            }
+            else if (Phaser.Input.Keyboard.JustDown(keySPACE)) {
+                //console.log(`Jump Buffer`)
+                this.jumpBuffer = this.bufferWindow;
+            } 
         }
 
         /* END INPUT HANDLING */
@@ -262,9 +269,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
     }
 
     dragHandler() {
-        if(this.body.velocity.x < this.maxVelocityX) return null;
-        let drag = 0.00003;
-        console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
+        if(this.body.velocity.x < this.maxVelocityX || this.isGrappled) return null;
+        let drag = this.dragForce;
+        //console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
         this.applyForce({x:-drag, y: 0});
     }
 

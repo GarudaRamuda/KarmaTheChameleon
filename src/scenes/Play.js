@@ -13,11 +13,11 @@ class Play extends Phaser.Scene {
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
         //declare looping objects in array
+        this.startingPlatform = this.matter.add.image(100, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4);
         this.objectArray = [
-            this.matter.add.image(100, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4),
-            this.matter.add.image(config.width, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4),
-            this.matter.add.image(600, 260, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
-            this.matter.add.image(config.width + 500, 260, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
+            this.matter.add.image(this.p1.x + 200, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
+            this.matter.add.image(this.p1.x + 200 + 426, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
+            this.matter.add.image(this.p1.x + 200 + 426 + 426, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
         ];
 
 
@@ -33,6 +33,7 @@ class Play extends Phaser.Scene {
         this.cameras.main.startFollow(this.p1, false, 0.04, 0);
         this.cameras.main.setBackgroundColor('#abefbd');
         this.cameras.main.followOffset.x = -300; 
+        this.p1.y = this.startingPlatform.y - this.startingPlatform.height/2;
        
     }
 
