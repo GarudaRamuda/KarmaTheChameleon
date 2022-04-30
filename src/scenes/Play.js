@@ -4,7 +4,6 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-        this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
         this.bg_far = this.add.tileSprite(0,0, 528, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
         this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
@@ -45,8 +44,6 @@ class Play extends Phaser.Scene {
     update() {   
         this.p1.update();
         this.tongue.track(this.p1);
-        this.sky.x = this.cameras.main.worldView.x;
-        this.sky.tilePositionX = Math.floor(this.cameras.main.worldView.x/2.7); 
 
         // check if dead
         if (this.p1.y >= config.height) { // touching bottom
