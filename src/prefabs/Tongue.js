@@ -20,7 +20,7 @@ class Tongue {
         if(!this.attatched) this.scene.tweens.add ({
             targets: this.sprite,
             scaleX: {from: 0, to: distance},
-            ease: 'Bounce',
+            ease: 'Expo.easeIn',
             duration: 100,
             repeat: 0,
             onStart: function () {this.animPlaying = true;},
