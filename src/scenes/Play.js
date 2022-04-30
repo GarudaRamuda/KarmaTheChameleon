@@ -16,8 +16,8 @@ class Play extends Phaser.Scene {
         this.objectArray = [
             this.matter.add.image(100, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4),
             this.matter.add.image(config.width, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4),
-            this.matter.add.image(600, 260, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
-            this.matter.add.image(config.width + 500, 260, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
+            this.matter.add.image(600, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
+            this.matter.add.image(config.width + 500, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
         ];
 
 
