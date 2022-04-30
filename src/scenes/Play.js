@@ -9,7 +9,8 @@ class Play extends Phaser.Scene {
         this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
-        this.tongue = new Tongue(this, `spr_tongue`);
+        this.tongueImg = this.add.image(50, 50, 'spr_tongue');
+        this.tongue = new Tongue(this, 'spr_tongue');
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
