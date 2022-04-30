@@ -8,12 +8,15 @@ let config = {
             gravity: {
                 y: 1.5
             },
+            //debug: {
+                //showBody: false,
+            //}
         }
     },
     pixelArt: true,
     fps: {
         target: 60,
-        forceSetTimeOut: false
+        forceSetTimeOut: true
     },
     scene: [Load, Menu, Play, Death]
 };
