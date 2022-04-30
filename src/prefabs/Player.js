@@ -54,7 +54,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleForce = .0007;
         this.grapplePush = 0.003;
 
-        this.jumpHeight = 9;
+        this.jumpHeight = 11;
         
         //Apex Floating Variables
         this.maxUpwardForce = 0.003;
@@ -66,7 +66,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 
-        this.maxVelocityX = 4;
+        this.maxVelocityX = 10;
+        this.dragForce = 0.003;
 
         // Track when sensors are touching something
         this.isTouching = {left: false, right: false, bottom: false};
@@ -263,7 +264,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
     dragHandler() {
         if(this.body.velocity.x < this.maxVelocityX) return null;
-        let drag = 0.00003;
+        let drag = this.dragForce;
         console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
         this.applyForce({x:-drag, y: 0});
     }
