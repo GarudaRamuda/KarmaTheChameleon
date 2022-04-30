@@ -33,6 +33,7 @@ class Play extends Phaser.Scene {
         this.cameras.main.startFollow(this.p1, false, 0.04, 0);
         this.cameras.main.setBackgroundColor('#abefbd');
         this.cameras.main.followOffset.x = -300; 
+        this.p1.y = this.startingPlatform.y - this.startingPlatform.height/2;
        
     }
 
