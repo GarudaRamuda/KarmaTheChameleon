@@ -244,21 +244,21 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         if (!keyA.isDown && !keyD.isDown && !this.isGrappled) this.sprite.anims.play('idle', true);
         if(Phaser.Input.Keyboard.JustDown(keySPACE) || this.jumpBuffer > 0) {
-            console.log(`Space pressed`)
-            console.log(`Jump buffer: ${this.jumpBuffer}, Last grounded: ${this.lastGrounded}`)
+            //console.log(`Space pressed`)
+           // console.log(`Jump buffer: ${this.jumpBuffer}, Last grounded: ${this.lastGrounded}`)
             if (this.lastGrounded > 0) {
-                console.log(`Jumping`)
+                //console.log(`Jumping`)
                 this.setVelocityY(-this.jumpHeight); // move up y-axis
                 this.lastGrounded = 0;
                 this.scene.sound.play('sound_jump');
                 this.groundSoundPlayed = false;
             }
             else if (this.lastGrounded < 0) {
-                console.log(`Grappling`)
+                //console.log(`Grappling`)
                 this.grapple();
             }
             else if (Phaser.Input.Keyboard.JustDown(keySPACE)) {
-                console.log(`Jump Buffer`)
+                //console.log(`Jump Buffer`)
                 this.jumpBuffer = this.bufferWindow;
             } 
         }
@@ -271,7 +271,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
     dragHandler() {
         if(this.body.velocity.x < this.maxVelocityX || this.isGrappled) return null;
         let drag = this.dragForce;
-        console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
+        //console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
         this.applyForce({x:-drag, y: 0});
     }
 
