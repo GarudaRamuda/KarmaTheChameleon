@@ -39,8 +39,9 @@ class Play extends Phaser.Scene {
        
     }
 
-    update() {
-        this.p1.update();   
+    update() {   
+        this.p1.update(); 
+        this.tongue.track(this.p1);
         this.sky.x = this.cameras.main.worldView.x;
         this.sky.tilePositionX = Math.floor(this.cameras.main.worldView.x/2.7); 
 
