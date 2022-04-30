@@ -297,7 +297,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 var otherBody;
                 var playerBody;
 
-                if (bodyA.isSensor)
+                if (bodyA.isSensor && bodyA.label != 'grapplable')
                 {
                     otherBody = bodyB;
                     playerBody = bodyA;

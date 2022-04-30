@@ -24,6 +24,7 @@ class Load extends Phaser.Scene {
         // sprites
         this.load.atlas('play', './assets/spritesheet.png', './assets/sprites.json', null, Phaser.Loader.TEXTURE_ATLAS_JSON_HASH);
         this.load.image('ground', './assets/ground.png');
+        this.load.image('grappleBranch', './assets/grappleBranch.png');
         this.load.image('collision', './assets/collisionmask.png');
         this.load.image('grappleMask', './assets/grappleMask.png');
         this.load.image('spr_tongue', './assets/tongue.png');
