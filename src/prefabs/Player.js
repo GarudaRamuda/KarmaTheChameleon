@@ -70,7 +70,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.dragForce = 0.003;
 
         // Track when sensors are touching something
-        this.isTouching = {left: false, right: false, bottom: false};
+        this.isTouching = {bottom: false};
 
         // Collision mask for grapplable objects in range of player
         this.grappleRect = scene.matter.add.image(0, 0, 'grappleMask', null, { isSensor: true, ignoreGravity: true,});
@@ -105,13 +105,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // (x, y, w, h, options)
         this.sensors = {
             bottom: Bodies.rectangle(0, h * 0.25, w * 0.15, 2, { isSensor: true }),
-            left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.25, { isSensor: true }),
-            right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.25, { isSensor: true }),
         };
     
         // Assemble the compound body and physics properties
         const compoundBody = Body.create({
-            parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right],
+            parts: [mainBody, this.sensors.bottom],
             frictionStatic: 0,
             frictionAir: 0,
             friction: 0.3,
@@ -172,7 +170,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         } else {
             // rotate back to normal
             if (isMovingLeft) {
-                //this.sprite.flipX = true;
+                this.sprite.flipX = true;
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x, this.sprite.y, 1);          
             } else {
                 this.sprite.rotateTo.rotateTowardsPosition(this.sprite.x+1, this.sprite.y, this.backflip);                     
@@ -214,7 +212,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         /* BEGIN INPUT HANDLING */
         if(keyA.isDown) {
-            //if (!this.sprite.flipX) this.sprite.flipX = true;
+            if (!this.sprite.flipX) this.sprite.flipX = true;
             if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
             else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             if (this.isGrappled) { 
@@ -228,7 +226,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
             }
         }
         if(keyD.isDown) {
-            //if (this.sprite.flipX) this.sprite.flipX = false;
+            if (this.sprite.flipX) this.sprite.flipX = false;
             if (!this.isGrappled && this.lastGrounded == this.coyoteTime) this.sprite.anims.play('walk', true);
             else if (!this.isGrappled) this.sprite.anims.play('idle', true);
             // Apply smaller force on a grapple
@@ -307,17 +305,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     otherBody = bodyA;
                     playerBody = bodyB;
                 }
-                if (playerBody === this.sensors.left) {
-                    this.isTouching.left = true;
-                    // TODO: Nudge main body away from walls based on the depth of collision. Difficulties accessing the members atm
-                }
-                else if (playerBody === this.sensors.right) {
-                    this.isTouching.right = true;
-                }
-                else if (playerBody === this.sensors.bottom) {
+
+                if (playerBody === this.sensors.bottom && !otherBody.isSensor) {
                     this.isTouching.bottom = true;
                 }
-
                 // voodoo logic because this.grappleRect does not reference the actual body that was created for it
                 else if (playerBody === this.grappleRect.body) {
                     if (otherBody.label == 'grapplable') {
