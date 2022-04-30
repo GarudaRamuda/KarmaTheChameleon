@@ -148,8 +148,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleRect.x = (this.sprite.flipX ? this.x - this.grappleRect.width/2:this.x + this.grappleRect.width/2);
         this.grappleRect.y = this.y - this.grappleRect.height/2;
 
-        if (!keySPACE.isDown) {
+        if (!keySPACE.isDown && this.isGrappled) {
             this.ungrapple();
+            if(this.scene.tongue.visible()) this.scene.tongue.setVisibility(false);
         }
 
         if(this.ropeCreatedFrameAgo) {
@@ -167,6 +168,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         
         if (this.isGrappled) {
             this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);
+            if(!this.scene.tongue.visible()) this.scene.tongue.setVisibility(true);
             this.scene.tongue.attatchTo({x: this.grapplePointX, y: this.grapplePointY});                        
         } else {
             // rotate back to normal

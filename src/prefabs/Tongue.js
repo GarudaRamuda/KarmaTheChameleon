@@ -5,6 +5,7 @@ class Tongue {
         this.sizeY = 8;
         this.sprite = scene.add.image(10, 10, texture, null).setScale(this.sizeX, this.sizeY).setOrigin(0, 0.5);
         this.attatched = false;
+        this.sprite.setVisible(false);
     }
 
     track(player) {
@@ -16,5 +17,13 @@ class Tongue {
         let distance = Phaser.Math.Distance.BetweenPoints(this.sprite, point);
         this.sprite.setRotation(angle);
         this.sprite.setScale(distance, this.sizeY);
+    }
+
+    setVisibility(visibility) {
+        this.sprite.setVisible(visibility);
+    }
+
+    visible() {
+        return this.sprite.visible;
     }
 };
