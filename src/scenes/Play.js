@@ -43,8 +43,8 @@ class Play extends Phaser.Scene {
         let scoreConfig = {
             fontFamily: 'stockyPixels',
             fontSize: '16px',
-            color: '#f5ffe8',
-            align: 'left',
+            color: '#377592',
+            align: 'right',
             padding: {
                 top: 5,
                 bottom: 5,
@@ -56,8 +56,7 @@ class Play extends Phaser.Scene {
         let scorePad = 20;
         this.distance = 0;
         this.offsetx = 125;
-        this.scoreBox = this.add.image(100, scorePad, 'button').setOrigin(0.5, 0.5).setScale(4, 2);   
-        this.score = this.add.text(100, this.scoreBox.y + 2, 'DISTANCE ' + this.distance, scoreConfig).setOrigin(0.5);
+        this.score = this.add.text(100, scorePad + 2, 'DISTANCE ' + this.distance, scoreConfig).setOrigin(0, 0.5);
     }
 
 
@@ -81,8 +80,7 @@ class Play extends Phaser.Scene {
     }
 
     updateScore() {
-        this.scoreBox.x = this.cameras.main.worldView.left + this.offsetx;
-        this.score.x = this.cameras.main.worldView.left + this.offsetx;
+        this.score.x = this.cameras.main.worldView.left + this.offsetx - 108;
         this.distance = (this.p1.x - 100) / 64 ;
         this.score.setText('DISTANCE ' + this.distance.toFixed(2));
     }
