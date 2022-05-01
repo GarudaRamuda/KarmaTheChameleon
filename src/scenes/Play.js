@@ -21,11 +21,13 @@ class Play extends Phaser.Scene {
         let branch1 = new GrappleBranch(this, this.matter.world, this.p1.x + 200, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
         let branch2 = new GrappleBranch(this, this.matter.world, this.p1.x + 200 + 426, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
         let branch3 = new GrappleBranch(this, this.matter.world, this.p1.x + 200 + 426*2, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
-        this.startingPlatform = this.matter.add.image(100, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4);
+        let branch_lg = this.matter.add.image(100, config.height, 'branch_lg', null, { restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
+        let branch_sm = this.matter.add.image(700, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
         this.objectArray = [
             branch1,
             branch2,
             branch3,
+            branch_sm,
         ];
 
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
@@ -40,7 +42,7 @@ class Play extends Phaser.Scene {
         this.cameras.main.startFollow(this.p1, false, 0.04, 0);
         this.cameras.main.setBackgroundColor('#abefbd');
         this.cameras.main.followOffset.x = -300; 
-        this.p1.y = this.startingPlatform.y - this.startingPlatform.height/2;
+        this.p1.y = branch_lg.y - branch_lg.height/2;
        
         let scoreConfig = {
             fontFamily: 'stockyPixels',

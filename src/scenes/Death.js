@@ -5,7 +5,7 @@ class Death extends Phaser.Scene {
 
     // get score
     init (data) {
-        console.log('init', data);
+        // console.log('init', data);
         this.finalScore = data.score;
     }
 
@@ -40,7 +40,7 @@ class Death extends Phaser.Scene {
         this.add.text(game.config.width/2, button1.y + 2, 'MENU', menuConfig).setOrigin(0.5);
 
         // display final score
-        console.log("finalScore: ", this.finalScore.toFixed(2));
+        // console.log("finalScore: ", this.finalScore.toFixed(2));
         let scorePad = 50;
         this.scoreBox = this.add.image(200, scorePad, 'button').setOrigin(0.5, 0.5).setScale(7, 3.5);   
         this.score = this.add.text(200, this.scoreBox.y + 2, 'DISTANCE: ' + this.finalScore.toFixed(2) + 'CM', scoreConfig).setOrigin(0.5);
