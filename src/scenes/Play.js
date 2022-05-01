@@ -4,8 +4,6 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-        this.matterTimeStep = 16.66;
-        this.accumulator = 0;
         this.matter.world.autoUpdate = false;
         this.matter.set60Hz();
         this.bg_far = this.add.tileSprite(0,0, 528, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
@@ -63,27 +61,23 @@ class Play extends Phaser.Scene {
     }
 
 
-    update(time, delta) {   
-        this.accumulator += delta;
-        while (this.accumulator >= this.matterTimeStep) {
-            this.accumulator -= this.matterTimeStep;
-            this.p1.update();
-            this.tongue.track(this.p1);
+    update() {   
+        this.p1.update();
+        this.tongue.track(this.p1);
 
-            // scoreboard
-            this.updateScore();
+        // scoreboard
+        this.updateScore();
 
-            // check if dead
-            if (this.p1.y >= config.height) { // touching bottom
-                this.scene.start('death', {score: this.distance});
-            }
-            // touching fire
-
-            //check if platforms are outside the screen and handle the behavior for that
-            this.loopingObjectHandler();
-            this.parallaxBGs();
-            this.matter.world.step(this.matterTimeStep)
+        // check if dead
+        if (this.p1.y >= config.height) { // touching bottom
+            this.scene.start('death', {score: this.distance});
         }
+        // touching fire
+
+        //check if platforms are outside the screen and handle the behavior for that
+        this.loopingObjectHandler();
+        this.parallaxBGs();
+        
     }
 
     updateScore() {
