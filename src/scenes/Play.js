@@ -30,6 +30,17 @@ class Play extends Phaser.Scene {
             branch_sm,
         ];
 
+        this.keyGuide = this.add.image(this.p1.x, this.p1.y - 6, 'keys', null).setScale(2).setOrigin(0.5).setAlpha(0);
+        this.tweens.add({
+            targets: this.keyGuide,
+            alpha: {value: 1, duration: 1000, ease: 'Power4'},
+            duration: 1500,
+            ease: 'Power4',
+            repeat: 0,
+            delay: 1000,
+            yoyo: true,
+            hold: 1000,
+        })
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
         keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W); // fix later
@@ -69,6 +80,8 @@ class Play extends Phaser.Scene {
         while (this.accumulator >= this.matterTimeStep) {
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
+            this.keyGuide.x = this.p1.x;
+            this.keyGuide.y += (this.p1.body.position.y - this.p1.body.positionPrev.y);
             this.tongue.track(this.p1);
 
             // scoreboard
