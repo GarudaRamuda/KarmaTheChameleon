@@ -37,9 +37,9 @@ class Play extends Phaser.Scene {
             duration: 1500,
             ease: 'Power4',
             repeat: 0,
-            delay: 1000,
+            delay: 500,
             yoyo: true,
-            hold: 500,
+            hold: 1300,
         })
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
