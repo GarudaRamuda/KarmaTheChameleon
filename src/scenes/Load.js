@@ -33,7 +33,8 @@ class Load extends Phaser.Scene {
         this.load.image('keys', './assets/keys.png');
 
         // Menu assets
-        this.load.image('menu', './assets/menu.png');
+        this.load.image('menu', './assets/menubg.png');
+        this.load.image('logo', './assets/logo.png');
         this.load.image('button', './assets/button.png');
         this.load.image('death_image', './assets/death.png');
     }
