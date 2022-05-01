@@ -23,7 +23,7 @@ class Death extends Phaser.Scene {
         }
         let scoreConfig = {
             fontFamily: 'stockyPixels',
-            fontSize: '22px',
+            fontSize: '16px',
             color: '#f5ffe8',
             align: 'center',
             padding: {
@@ -43,7 +43,7 @@ class Death extends Phaser.Scene {
         console.log("finalScore: ", this.finalScore.toFixed(2));
         let scorePad = 50;
         this.scoreBox = this.add.image(200, scorePad, 'button').setOrigin(0.5, 0.5).setScale(7, 3.5);   
-        this.score = this.add.text(200, this.scoreBox.y + 2, 'Distance ' + this.finalScore.toFixed(2) + ' (in chamelemeters)', scoreConfig).setOrigin(0.5);
+        this.score = this.add.text(200, this.scoreBox.y + 2, 'DISTANCE: ' + this.finalScore.toFixed(2) + 'CM', scoreConfig).setOrigin(0.5);
         
 
         // Change Alpha on button
