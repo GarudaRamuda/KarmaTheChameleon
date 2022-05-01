@@ -3,11 +3,28 @@ class Death extends Phaser.Scene {
         super("death");
     }
 
+    // get score
+    init (data) {
+        console.log('init', data);
+        this.finalScore = data.score;
+    }
+
     create () {
         let menuConfig = {
             fontFamily: 'stockyPixels',
             fontSize: '16px',
             color: '#fa0251',
+            align: 'center',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 0
+        }
+        let scoreConfig = {
+            fontFamily: 'stockyPixels',
+            fontSize: '22px',
+            color: '#f5ffe8',
             align: 'center',
             padding: {
                 top: 5,
@@ -21,6 +38,13 @@ class Death extends Phaser.Scene {
         let button1 = this.add.image(game.config.width/2, button1Pad, 'button').setOrigin(0.5, 0.5).setScale(2);
         button1.setInteractive();
         this.add.text(game.config.width/2, button1.y + 2, 'MENU', menuConfig).setOrigin(0.5);
+
+        // display final score
+        console.log("finalScore: ", this.finalScore.toFixed(2));
+        let scorePad = 50;
+        this.scoreBox = this.add.image(200, scorePad, 'button').setOrigin(0.5, 0.5).setScale(7, 3.5);   
+        this.score = this.add.text(200, this.scoreBox.y + 2, 'Distance ' + this.finalScore.toFixed(2) + ' (in chamelemeters)', scoreConfig).setOrigin(0.5);
+        
 
         // Change Alpha on button
         button1.on('pointerover', () => {

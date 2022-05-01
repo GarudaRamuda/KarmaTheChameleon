@@ -138,6 +138,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grapplePointX;
         this.grapplePointY;
         this.backflip;
+
+        
     }
 
     update() {

@@ -35,6 +35,24 @@ class Play extends Phaser.Scene {
         this.cameras.main.followOffset.x = -300; 
         this.p1.y = this.startingPlatform.y - this.startingPlatform.height/2;
        
+        let scoreConfig = {
+            fontFamily: 'stockyPixels',
+            fontSize: '20px',
+            color: '#f5ffe8',
+            align: 'center',
+            padding: {
+                top: 5,
+                bottom: 5,
+            },
+            fixedWidth: 0
+        }
+        
+        // create scoreboard
+        let scorePad = 20;
+        this.distance = 0;
+        this.offsetx = 125;
+        this.scoreBox = this.add.image(100, scorePad, 'button').setOrigin(0.5, 0.5).setScale(4, 2);   
+        this.score = this.add.text(100, this.scoreBox.y + 2, 'Distance ' + this.distance, scoreConfig).setOrigin(0.5);
     }
 
     update() {
@@ -42,15 +60,26 @@ class Play extends Phaser.Scene {
         this.sky.x = this.cameras.main.worldView.x;
         this.sky.tilePositionX = Math.floor(this.cameras.main.worldView.x/2.7); 
 
+        // scoreboard
+        this.updateScore();
+
         // check if dead
         if (this.p1.y >= config.height) { // touching bottom
-            this.scene.start('death');
+            this.scene.start('death', {score: this.distance});
         }
         // touching fire
 
         //check if platforms are outside the screen and handle the behavior for that
         this.loopingObjectHandler();
         this.parallaxBGs();
+    }
+
+    updateScore() {
+        this.scoreBox.x = this.cameras.main.worldView.left + this.offsetx;
+        this.score.x = this.cameras.main.worldView.left + this.offsetx;
+        this.distance = (this.p1.x - 100) / 64 ;
+        this.score.setText('Distance ' + this.distance.toFixed(2));
+        console.log("Distance: ", this.distance.toFixed(0));
     }
 
     // Loops through array of objects that must be culled when oustisde left side of screen
