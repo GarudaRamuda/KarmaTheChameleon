@@ -4,22 +4,25 @@ class Play extends Phaser.Scene {
     }
 
     create() {
-        this.sky = this.add.tileSprite(0,0, config.width, config.height, 'play', 'sky').setOrigin(0.5,0).setScale(2);
         this.bg_far = this.add.tileSprite(0,0, 528, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
         this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
+        this.tongueImg = this.add.image(50, 50, 'spr_tongue');
+        this.tongue = new Tongue(this, 'spr_tongue');
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
         //declare looping objects in array
+        let branch1 = new GrappleBranch(this, this.matter.world, this.p1.x + 200, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
+        let branch2 = new GrappleBranch(this, this.matter.world, this.p1.x + 200 + 426, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
+        let branch3 = new GrappleBranch(this, this.matter.world, this.p1.x + 200 + 426*2, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
         this.startingPlatform = this.matter.add.image(100, config.height, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(1, 4);
         this.objectArray = [
-            this.matter.add.image(this.p1.x + 200, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
-            this.matter.add.image(this.p1.x + 200 + 426, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
-            this.matter.add.image(this.p1.x + 200 + 426 + 426, 100, 'ground', null, { restitution: 0, isStatic: true, label: "grapplable" }).setScale(0.0125, 1),
+            branch1,
+            branch2,
+            branch3,
         ];
-
 
         keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -55,10 +58,10 @@ class Play extends Phaser.Scene {
         this.score = this.add.text(100, this.scoreBox.y + 2, 'Distance ' + this.distance, scoreConfig).setOrigin(0.5);
     }
 
-    update() {
-        this.p1.update();   
-        this.sky.x = this.cameras.main.worldView.x;
-        this.sky.tilePositionX = Math.floor(this.cameras.main.worldView.x/2.7); 
+
+    update() {   
+        this.p1.update();
+        this.tongue.track(this.p1);
 
         // scoreboard
         this.updateScore();
@@ -92,7 +95,7 @@ class Play extends Phaser.Scene {
 
             if(!this.isOffLeft(camera, object)) continue;
 
-            object.x = worldView.right + object.width/2;
+            object.x = worldView.right + object.width;
         }
     }
 
@@ -102,7 +105,7 @@ class Play extends Phaser.Scene {
     // post: returns true if object is outside camera view to the left, false otherwise
     isOffLeft(camera, object) {
         let worldView = camera.worldView;
-        let objectRight = object.x + object.width/2;
+        let objectRight = object.x + object.width;
         return objectRight < worldView.left;  
     }
 

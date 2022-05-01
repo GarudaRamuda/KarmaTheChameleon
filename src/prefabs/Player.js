@@ -11,7 +11,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.scene = scene;
         
         // hide collision
-        this.setAlpha(0);
+        this.visible = false;
 
         // actual displayed sprite
         this.sprite = scene.add.sprite(0, 0, 'play', 'chameleonWalk_01').setScale(2);
@@ -70,7 +70,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.dragForce = 0.003;
 
         // Track when sensors are touching something
-        this.isTouching = {left: false, right: false, bottom: false};
+        this.isTouching = {bottom: false};
 
         // Collision mask for grapplable objects in range of player
         this.grappleRect = scene.matter.add.image(0, 0, 'grappleMask', null, { isSensor: true, ignoreGravity: true,});
@@ -105,13 +105,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // (x, y, w, h, options)
         this.sensors = {
             bottom: Bodies.rectangle(0, h * 0.25, w * 0.15, 2, { isSensor: true }),
-            left: Bodies.rectangle(-w * 0.35, 0, 2, h * 0.25, { isSensor: true }),
-            right: Bodies.rectangle(w * 0.35, 0, 2, h * 0.25, { isSensor: true }),
         };
     
         // Assemble the compound body and physics properties
         const compoundBody = Body.create({
-            parts: [mainBody, this.sensors.bottom, this.sensors.left, this.sensors.right],
+            parts: [mainBody, this.sensors.bottom],
             frictionStatic: 0,
             frictionAir: 0,
             friction: 0.3,
@@ -150,8 +148,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleRect.x = (this.sprite.flipX ? this.x - this.grappleRect.width/2:this.x + this.grappleRect.width/2);
         this.grappleRect.y = this.y - this.grappleRect.height/2;
 
-        if (!keySPACE.isDown) {
+        if (!keySPACE.isDown && this.isGrappled) {
             this.ungrapple();
+            this.scene.tongue.detach();
         }
 
         if(this.ropeCreatedFrameAgo) {
@@ -168,7 +167,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
         let isMovingLeft = (this.scene.p1.body.velocity.x < 0 ? true : false);
         
         if (this.isGrappled) {
-            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);                        
+            this.sprite.rotateTo.rotateTowardsPosition(this.grapplePointX, this.grapplePointY, 0);
+            this.scene.tongue.attatchTo({x: this.grapplePointX, y: this.grapplePointY});                        
         } else {
             // rotate back to normal
             if (isMovingLeft) {
@@ -297,7 +297,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 var otherBody;
                 var playerBody;
 
-                if (bodyA.isSensor)
+                if (bodyA.isSensor && bodyA.label != 'grapplable')
                 {
                     otherBody = bodyB;
                     playerBody = bodyA;
@@ -307,17 +307,10 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     otherBody = bodyA;
                     playerBody = bodyB;
                 }
-                if (playerBody === this.sensors.left) {
-                    this.isTouching.left = true;
-                    // TODO: Nudge main body away from walls based on the depth of collision. Difficulties accessing the members atm
-                }
-                else if (playerBody === this.sensors.right) {
-                    this.isTouching.right = true;
-                }
-                else if (playerBody === this.sensors.bottom) {
+
+                if (playerBody === this.sensors.bottom && !otherBody.isSensor) {
                     this.isTouching.bottom = true;
                 }
-
                 // voodoo logic because this.grappleRect does not reference the actual body that was created for it
                 else if (playerBody === this.grappleRect.body) {
                     if (otherBody.label == 'grapplable') {
@@ -363,7 +356,9 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     this.bodyArray = [];
                     // Generate an array of segments to form our rope
                     for (let i = 0; i < Math.floor(ropeLength / ropeStep) - 1; i++) {
-                        let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'play', 'seg', {shape: 'circle', mass:0.1}).setScale(2);
+
+                        let seg = this.scene.matter.add.image(points[i].x, points[i].y, 'play', 'seg', {shape: 'circle', mass:0.1}).setScale(2).setVisible(false);
+
                         this.bodyArray.push(seg);
 
                         // First segment binds to a point in the world
@@ -389,8 +384,8 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
                     this.sprite.anims.play('grapple', true);
                     break;
-                    // this.setVelocityX(0);
-                    // this.setVelocityY(0);
+                    this.setVelocityX(0);
+                    this.setVelocityY(0);
                 }
             }
         }
@@ -399,9 +394,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
     ungrapple() {
         if (this.isGrappled) {
             this.scene.matter.world.removeConstraint(this.grappleArray);
-            for (let i = 0; i < this.bodyArray.length; i++) {
-                this.bodyArray[i].visible = false;
-            }
             this.scene.matter.world.remove(this.bodyArray);
             this.isGrappled = false;
             this.sprite.anims.play('idle', true);
