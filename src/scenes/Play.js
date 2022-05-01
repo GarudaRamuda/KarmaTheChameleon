@@ -94,7 +94,7 @@ class Play extends Phaser.Scene {
             // touching fire
 
             //check if platforms are outside the screen and handle the behavior for that
-            this.loopingObjectHandler();
+            this.destroyOffScreen();
             this.parallaxBGs();
             this.matter.world.step(this.matterTimeStep);
         }
@@ -109,15 +109,15 @@ class Play extends Phaser.Scene {
 
     // Loops through array of objects that must be culled when oustisde left side of screen
     // Can handle each object in a variety of ways, but will just bring it back to the beginning for the time being
-    loopingObjectHandler() {
+    destroyOffScreen() {
         let camera = this.cameras.main;
         let worldView = camera.worldView;
         for(let i = 0; i < this.objectArray.length; i++) {
             let object = this.objectArray[i];
 
             if(!this.isOffLeft(camera, object)) continue;
-
-            object.x = worldView.right + object.width;
+            object.destroy();
+            this.objectArray.splice(i);
         }
     }
 
