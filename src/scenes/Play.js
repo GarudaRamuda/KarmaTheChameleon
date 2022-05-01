@@ -4,6 +4,10 @@ class Play extends Phaser.Scene {
     }
 
     create() {
+        this.matterTimeStep = 1000/60;
+        this.accumulator = 0;
+        this.matter.world.autoUpdate = false;
+        this.matter.set60Hz();
         this.bg_far = this.add.tileSprite(0,0, 528, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
         this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
@@ -40,9 +44,9 @@ class Play extends Phaser.Scene {
        
         let scoreConfig = {
             fontFamily: 'stockyPixels',
-            fontSize: '20px',
-            color: '#f5ffe8',
-            align: 'center',
+            fontSize: '16px',
+            color: '#377592',
+            align: 'right',
             padding: {
                 top: 5,
                 bottom: 5,
@@ -54,35 +58,38 @@ class Play extends Phaser.Scene {
         let scorePad = 20;
         this.distance = 0;
         this.offsetx = 125;
-        this.scoreBox = this.add.image(100, scorePad, 'button').setOrigin(0.5, 0.5).setScale(4, 2);   
-        this.score = this.add.text(100, this.scoreBox.y + 2, 'Distance ' + this.distance, scoreConfig).setOrigin(0.5);
+        this.score = this.add.text(100, scorePad + 2, 'DISTANCE ' + this.distance, scoreConfig).setOrigin(0, 0.5);
     }
 
 
-    update() {   
-        this.p1.update();
-        this.tongue.track(this.p1);
+    update(time, delta) {   
+        this.accumulator += delta;
+        while (this.accumulator >= this.matterTimeStep) {
+            this.accumulator -= this.matterTimeStep;
+            this.p1.update();
+            this.tongue.track(this.p1);
 
-        // scoreboard
-        this.updateScore();
+            // scoreboard
+            this.updateScore();
 
-        // check if dead
-        if (this.p1.y >= config.height) { // touching bottom
-            this.scene.start('death', {score: this.distance});
+            // check if dead
+            if (this.p1.y >= config.height) { // touching bottom
+                this.scene.start('death', {score: this.distance});
+            }
+            // touching fire
+
+            //check if platforms are outside the screen and handle the behavior for that
+            this.loopingObjectHandler();
+            this.parallaxBGs();
+            this.matter.world.step(this.matterTimeStep);
         }
-        // touching fire
-
-        //check if platforms are outside the screen and handle the behavior for that
-        this.loopingObjectHandler();
-        this.parallaxBGs();
+        
     }
 
     updateScore() {
-        this.scoreBox.x = this.cameras.main.worldView.left + this.offsetx;
-        this.score.x = this.cameras.main.worldView.left + this.offsetx;
+        this.score.x = this.cameras.main.worldView.left + this.offsetx - 108;
         this.distance = (this.p1.x - 100) / 64 ;
-        this.score.setText('Distance ' + this.distance.toFixed(2));
-        console.log("Distance: ", this.distance.toFixed(0));
+        this.score.setText('DISTANCE ' + this.distance.toFixed(2));
     }
 
     // Loops through array of objects that must be culled when oustisde left side of screen
