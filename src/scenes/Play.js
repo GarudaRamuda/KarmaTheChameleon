@@ -22,10 +22,10 @@ class Play extends Phaser.Scene {
         //declare different object types
         this.objectProtos = [
             {spawn: () => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
-            {spawn: () => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
+            {spawn: () => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
         ];
 
-        //declare looping objects in array
+        //declare starting objects in array
         let branch1 = new GrappleBranch(this, this.matter.world, 500, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
         let branch_lg = this.matter.add.image(100, config.height, 'branch_lg', null, { restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
         let branch_sm = this.matter.add.image(900, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
