@@ -54,7 +54,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleForce = .0007;
         this.grapplePush = 0.003;
 
-        this.jumpHeight = 11;
+        this.jumpHeight = 9;
         
         //Apex Floating Variables
         this.maxUpwardForce = 0.006;
