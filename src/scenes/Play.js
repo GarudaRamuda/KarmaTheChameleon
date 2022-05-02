@@ -202,10 +202,10 @@ class Play extends Phaser.Scene {
     parallaxBGs() {
         
         this.parallaxAmount(this.bg_far);
-        this.parallaxAmount(this.bg_mid2, 3.3);
+        this.parallaxAmount(this.bg_mid2, 4);
         this.parallaxAmount(this.bg_mid, 2.4);
-        this.parallaxAmount(this.bg_trees, 1.9);
-        this.parallaxAmount(this.bg_close, 1.8);
+        this.parallaxAmount(this.bg_trees, 2.2);
+        this.parallaxAmount(this.bg_close, 2.1);
     }
 
     // Function that takes a tilesprite and has it parallax based off of a given amount
