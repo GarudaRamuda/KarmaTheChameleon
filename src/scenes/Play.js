@@ -18,6 +18,14 @@ class Play extends Phaser.Scene {
         this.hasSpawned = false;
         this.dead = false;
 
+        
+        this.birdSounds = this.sound.add('sound_birds', {loop: true});
+        this.birdSounds.play();
+
+        this.jungleSound = this.sound.add('sound_jungle', {loop: true});
+        this.jungleSound.play();
+
+
         this.soundFireClose = this.sound.add('sound_fire_close', {loop:true});
         this.soundFireMed = this.sound.add('sound_fire_med', {loop:true});
         this.soundFireFar = this.sound.add('sound_fire_far', {loop:true});
@@ -104,6 +112,8 @@ class Play extends Phaser.Scene {
                 this.volumeFade(this.soundFireClose);
                 this.volumeFade(this.soundFireMed);
                 this.volumeFade(this.soundFireFar);
+                this.volumeFade(this.birdSounds);
+                this.volumeFade(this.jungleSound);
             }
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
