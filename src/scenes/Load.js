@@ -43,6 +43,11 @@ class Load extends Phaser.Scene {
         this.load.image('death_chameleon', './assets/deadChameleon.png');
         this.load.image('death_wings', './assets/wings.png');
         this.load.image('death_msg', './assets/youDied.png');
+
+        // Load Sounds
+        this.load.audio('song_drums', './assets/Music/Menu_Loop.wav');
+        this.load.audio('song_intro', './assets/Music/Song Intro.wav');
+        this.load.audio('song_loop', './assets/Music/Song Loop.wav')
     }
 
     create() {

@@ -16,6 +16,10 @@ class Play extends Phaser.Scene {
         this.tongue = new Tongue(this, 'spr_tongue');
         this.spawnGap = 6;
         this.hasSpawned = false;
+        this.introSong = this.sound.add('song_intro');
+        this.loopSong = this.sound.add('song_loop', {loop: true});
+        this.introSong.play();
+        this.introSong.once('complete', () => {this.loopSong.play();});
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
@@ -87,7 +91,7 @@ class Play extends Phaser.Scene {
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
             this.p1.maxVelocityX = Math.floor(this.distance/100) + 4
-            console.log(`Max speed: ${this.p1.maxVelocityX}`);
+            //console.log(`Max speed: ${this.p1.maxVelocityX}`);
             this.keyGuide.x = this.p1.x;
             this.keyGuide.y += (this.p1.body.position.y - this.p1.body.positionPrev.y);
             this.tongue.track(this.p1);
@@ -114,7 +118,7 @@ class Play extends Phaser.Scene {
             this.hasSpawned = false;
             return null;
         }
-        console.log(`${this.hasSpawned}`)
+        //console.log(`${this.hasSpawned}`)
         if(!this.hasSpawned) {
             this.hasSpawned = true;
             this.spawnNewObject();

@@ -28,6 +28,8 @@ class Menu extends Phaser.Scene {
         button2.setInteractive();        
         this.add.text(game.config.width/2, button1.y + 2, 'PLAY!', menuConfig).setOrigin(0.5);
         this.add.text(game.config.width/2, button2.y + 2, 'QUIT', menuConfig).setOrigin(0.5);
+        this.menuSong = this.sound.add('song_drums', {loop: true});
+        this.menuSong.play();
 
         // Change Alpha on buttons
         button1.on('pointerover', () => {
@@ -49,6 +51,7 @@ class Menu extends Phaser.Scene {
 
         // Got to Play scene
         button1.on('pointerdown', () => {
+            this.menuSong.stop();
             this.scene.start('play');
         });
         // Nuke it
