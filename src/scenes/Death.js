@@ -57,7 +57,7 @@ class Death extends Phaser.Scene {
         // console.log("finalScore: ", this.finalScore.toFixed(2));
         let scorePad = 144;
         this.score = this.add.text(game.config.width/2, scorePad + 2, 'DISTANCE: ' + this.finalScore.toFixed(2) + 'CM', scoreConfig).setOrigin(0.5).setAlpha(0.65);
-        
+
         // Change Alpha on button
         button1.on('pointerover', () => {
             button1.alpha = 0.1;

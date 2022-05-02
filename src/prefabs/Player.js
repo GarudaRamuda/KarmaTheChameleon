@@ -57,16 +57,16 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.jumpHeight = 11;
         
         //Apex Floating Variables
-        this.maxUpwardForce = 0.003;
+        this.maxUpwardForce = 0.006;
         this.startingVelocity = 1;
-        this.terminatingVelocity = 1;
+        this.terminatingVelocity = 3;
 
         // Value to apply additional force to player after releasing grapple
         this.yBoost = 0.07;
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 
-        this.maxVelocityX = 7;
+        this.maxVelocityX = 5;
         this.dragForce = 0.003;
 
         // Track when sensors are touching something
