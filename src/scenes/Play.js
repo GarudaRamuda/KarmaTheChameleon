@@ -14,26 +14,32 @@ class Play extends Phaser.Scene {
         this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
         this.tongueImg = this.add.image(50, 50, 'spr_tongue');
         this.tongue = new Tongue(this, 'spr_tongue');
+        this.spawnGap = 6;
+        this.hasSpawned = false;
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
-        //declare looping objects in array
-        let branch1 = new GrappleBranch(this, this.matter.world, this.p1.x + 200, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
-        let branch2 = new GrappleBranch(this, this.matter.world, this.p1.x + 200 + 426, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
-        let branch3 = new GrappleBranch(this, this.matter.world, this.p1.x + 200 + 426*2, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
+        //declare different object types
+        this.objectProtos = [
+            {spawn: () => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
+            {spawn: () => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
+        ];
+
+        //declare starting objects in array
+        let branch1 = new GrappleBranch(this, this.matter.world, 500, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
         let branch_lg = this.matter.add.image(100, config.height, 'branch_lg', null, { restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
-        let branch_sm = this.matter.add.image(700, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
+        let branch_sm = this.matter.add.image(900, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
         this.objectArray = [
             branch1,
-            branch2,
-            branch3,
             branch_sm,
+            branch_lg,
         ];
 
         this.keyGuide = this.add.image(this.p1.x, this.p1.y - 6, 'keys', null).setScale(2).setOrigin(0.5).setAlpha(0);
         this.tweens.add({
             targets: this.keyGuide,
             alpha: {value: 1, duration: 1000, ease: 'Power4'},
+            y: {from: this.keyGuide.y + 30, to: this.keyGuide.y},
             duration: 1500,
             ease: 'Power4',
             repeat: 0,
@@ -94,11 +100,35 @@ class Play extends Phaser.Scene {
             // touching fire
 
             //check if platforms are outside the screen and handle the behavior for that
-            this.loopingObjectHandler();
+            this.destroyOffScreen();
             this.parallaxBGs();
             this.matter.world.step(this.matterTimeStep);
+            this.spawnController();
         }
-        
+    }
+
+    spawnController() {
+        if (Math.floor(this.distance % this.spawnGap) != 5) {
+            this.hasSpawned = false;
+            return null;
+        }
+        console.log(`${this.hasSpawned}`)
+        if(!this.hasSpawned) {
+            this.hasSpawned = true;
+            this.spawnNewObject();
+        }
+    }
+
+    spawnNewObject() {
+        let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));
+        console.log(`Selection: ${selection}`);
+        this.objectProtos[selection].spawn();
+    }
+
+    // Code copied from developer.mozilla.org
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+    getRandomArbitrary(min, max) {
+        return Math.random() * (max - min) + min;
     }
 
     updateScore() {
@@ -109,15 +139,15 @@ class Play extends Phaser.Scene {
 
     // Loops through array of objects that must be culled when oustisde left side of screen
     // Can handle each object in a variety of ways, but will just bring it back to the beginning for the time being
-    loopingObjectHandler() {
+    destroyOffScreen() {
         let camera = this.cameras.main;
         let worldView = camera.worldView;
         for(let i = 0; i < this.objectArray.length; i++) {
             let object = this.objectArray[i];
 
             if(!this.isOffLeft(camera, object)) continue;
-
-            object.x = worldView.right + object.width;
+            object.destroy();
+            this.objectArray.splice(i);
         }
     }
 
