@@ -22,7 +22,7 @@ class Play extends Phaser.Scene {
         //declare different object types
         this.objectProtos = [
             {spawn: () => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
-            {spawn: () => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
+            {spawn: () => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true))},
         ];
 
         //declare starting objects in array
@@ -86,7 +86,7 @@ class Play extends Phaser.Scene {
         while (this.accumulator >= this.matterTimeStep) {
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
-            this.p1.maxVelocityX = Math.floor(this.distance/100) + 3
+            this.p1.maxVelocityX = Math.floor(this.distance/100) + 4
             console.log(`Max speed: ${this.p1.maxVelocityX}`);
             this.keyGuide.x = this.p1.x;
             this.keyGuide.y += (this.p1.body.position.y - this.p1.body.positionPrev.y);
