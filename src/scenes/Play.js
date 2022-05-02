@@ -86,6 +86,8 @@ class Play extends Phaser.Scene {
         while (this.accumulator >= this.matterTimeStep) {
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
+            this.p1.maxVelocityX = Math.floor(this.distance/100) + 3
+            console.log(`Max speed: ${this.p1.maxVelocityX}`);
             this.keyGuide.x = this.p1.x;
             this.keyGuide.y += (this.p1.body.position.y - this.p1.body.positionPrev.y);
             this.tongue.track(this.p1);
@@ -121,7 +123,7 @@ class Play extends Phaser.Scene {
 
     spawnNewObject() {
         let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));
-        console.log(`Selection: ${selection}`);
+        //console.log(`Selection: ${selection}`);
         this.objectProtos[selection].spawn();
     }
 
