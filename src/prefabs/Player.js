@@ -62,7 +62,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.terminatingVelocity = 3;
 
         // Value to apply additional force to player after releasing grapple
-        this.yBoost = 0.07;
+        this.yBoost = 0.03;
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 

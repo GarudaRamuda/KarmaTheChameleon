@@ -19,6 +19,24 @@ class Play extends Phaser.Scene {
         this.hasSpawned = false;
         this.dead = false;
 
+        //load fire animation
+        this.bodyFire = this.add.sprite(0,config.height+6,'body_fire').setOrigin(1,1).setScale(2);
+        this.anims.create({
+            key: 'burn!!',
+            frames: this.anims.generateFrameNumbers('body_fire', {start: 0, end: 59, first: 0}),
+            frameRate: 60,
+            repeat: -1
+        });
+        this.bodyFire.play('burn!!');
+        this.sideFire = this.add.sprite(0,config.height+6,'side_fire').setOrigin(0,1).setScale(2);
+        this.anims.create({
+            key: 'burn!',
+            frames: this.anims.generateFrameNumbers('side_fire', {start: 0, end: 59, first: 0}),
+            frameRate: 60,
+            repeat: -1
+        });
+        this.sideFire.play('burn!');
+        
         
         this.birdSounds = this.sound.add('sound_birds', {loop: true});
         this.birdSounds.play();
@@ -139,8 +157,11 @@ class Play extends Phaser.Scene {
             //check if platforms are outside the screen and handle the behavior for that
             this.destroyOffScreen();
             this.parallaxBGs();
-            this.matter.world.step(this.matterTimeStep);
             this.spawnController();
+            this.sideFire.x = this.cameras.main.worldView.left - 30;
+            this.bodyFire.x = this.cameras.main.worldView.left + 200;
+
+            this.matter.world.step(this.matterTimeStep);
         }
     }
 

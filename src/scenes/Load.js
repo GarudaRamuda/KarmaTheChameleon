@@ -31,6 +31,8 @@ class Load extends Phaser.Scene {
         this.load.image('grappleMask', './assets/grappleMask.png');
         this.load.image('spr_tongue', './assets/tongue.png');
         this.load.image('keys', './assets/keys.png');
+        this.load.spritesheet('side_fire', './assets/fire_side_233x293.png', {frameWidth: 233, frameHeight: 293});
+        this.load.spritesheet('body_fire', './assets/fire_body_509x293.png', {frameWidth: 509, frameHeight: 293});
 
         // Menu assets
         this.load.image('menu', './assets/menubg.png');
