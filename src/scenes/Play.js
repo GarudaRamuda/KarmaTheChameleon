@@ -39,7 +39,6 @@ class Play extends Phaser.Scene {
         this.tweens.add({
             targets: this.keyGuide,
             alpha: {value: 1, duration: 1000, ease: 'Power4'},
-            y: {from: this.keyGuide.y + 30, to: this.keyGuide.y},
             duration: 1500,
             ease: 'Power4',
             repeat: 0,
