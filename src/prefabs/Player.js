@@ -54,7 +54,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleForce = .0007;
         this.grapplePush = 0.003;
 
-        this.jumpHeight = 11;
+        this.jumpHeight = 9;
         
         //Apex Floating Variables
         this.maxUpwardForce = 0.006;
@@ -327,6 +327,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 // Check that the clicked body is considered grapplable
                 if (this.grappleTargets[i] != null && this.grappleTargets[i].label == 'grapplable') {
                     let body = this.grappleTargets[i];
+                    body.parent.jiggle();
                     // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
                     let ropeLength = Phaser.Math.Distance.BetweenPoints(body.position, this);
 

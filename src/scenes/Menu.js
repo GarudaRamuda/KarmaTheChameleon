@@ -21,13 +21,17 @@ class Menu extends Phaser.Scene {
         this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
-        this.logo = this.add.image(config.width/2, 40, 'logo').setOrigin(0.5,0).setScale(2); 
+      
+        this.logo = this.add.image(config.width/2, config.height/3, 'logo').setOrigin(0.5,0.5).setScale(2);
+      
         let button1 = this.add.image(game.config.width/2, button1Pad, 'button').setOrigin(0.5, 0.5).setScale(2);
         let button2 = this.add.image(game.config.width/2, button2Pad, 'button').setOrigin(0.5, 0.5).setScale(2);   
         button1.setInteractive();
         button2.setInteractive();        
         this.add.text(game.config.width/2, button1.y + 2, 'PLAY!', menuConfig).setOrigin(0.5);
         this.add.text(game.config.width/2, button2.y + 2, 'QUIT', menuConfig).setOrigin(0.5);
+        this.menuSong = this.sound.add('song_drums', {loop: true});
+        this.menuSong.play();
 
         // Change Alpha on buttons
         button1.on('pointerover', () => {
@@ -49,6 +53,7 @@ class Menu extends Phaser.Scene {
 
         // Got to Play scene
         button1.on('pointerdown', () => {
+            this.menuSong.stop();
             this.scene.start('play');
         });
         // Nuke it

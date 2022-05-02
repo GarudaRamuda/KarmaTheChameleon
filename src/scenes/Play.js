@@ -17,6 +17,29 @@ class Play extends Phaser.Scene {
         this.tongue = new Tongue(this, 'spr_tongue');
         this.spawnGap = 6;
         this.hasSpawned = false;
+        this.dead = false;
+
+        
+        this.birdSounds = this.sound.add('sound_birds', {loop: true});
+        this.birdSounds.play();
+
+        this.jungleSound = this.sound.add('sound_jungle', {loop: true});
+        this.jungleSound.play();
+
+
+        this.soundFireClose = this.sound.add('sound_fire_close', {loop:true});
+        this.soundFireMed = this.sound.add('sound_fire_med', {loop:true});
+        this.soundFireFar = this.sound.add('sound_fire_far', {loop:true});
+
+        this.soundFireClose.play();
+        this.soundFireMed.play();
+        this.soundFireFar.play();
+        
+        this.introSong = this.sound.add('song_intro');
+        this.loopSong = this.sound.add('song_loop', {loop: true});
+
+        this.introSong.play();
+        this.introSong.once('complete', () => {if(!this.dead) this.loopSong.play();});
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
@@ -84,10 +107,18 @@ class Play extends Phaser.Scene {
     update(time, delta) {   
         this.accumulator += delta;
         while (this.accumulator >= this.matterTimeStep) {
+            if(this.dead) {
+                this.volumeFade(this.loopSong);
+                this.volumeFade(this.soundFireClose);
+                this.volumeFade(this.soundFireMed);
+                this.volumeFade(this.soundFireFar);
+                this.volumeFade(this.birdSounds);
+                this.volumeFade(this.jungleSound);
+            }
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
             this.p1.maxVelocityX = Math.floor(this.distance/100) + 4
-            console.log(`Max speed: ${this.p1.maxVelocityX}`);
+            //console.log(`Max speed: ${this.p1.maxVelocityX}`);
             this.keyGuide.x = this.p1.x;
             this.keyGuide.y += (this.p1.body.position.y - this.p1.body.positionPrev.y);
             this.tongue.track(this.p1);
@@ -96,8 +127,12 @@ class Play extends Phaser.Scene {
             this.updateScore();
 
             // check if dead
-            if (this.p1.y >= config.height) { // touching bottom
-                this.scene.start('death', {score: this.distance});
+            if (this.p1.y >= config.height + 40) { // touching bottom
+                this.dead = true;
+                setTimeout(() => {
+                    this.sound.stopAll();
+                    this.scene.start('death', {score: this.distance});
+                }, 1500);
             }
             // touching fire
 
@@ -114,7 +149,7 @@ class Play extends Phaser.Scene {
             this.hasSpawned = false;
             return null;
         }
-        console.log(`${this.hasSpawned}`)
+        //console.log(`${this.hasSpawned}`)
         if(!this.hasSpawned) {
             this.hasSpawned = true;
             this.spawnNewObject();
@@ -183,5 +218,11 @@ class Play extends Phaser.Scene {
         //Create parralax amount
         if(offsetAmount == 0) return null;
         tileSprite.tilePositionX = worldView.x/offsetAmount;
+    }
+
+    volumeFade(song, time = 1){
+        song.setVolume(song.volume - (1/(60*time)));
+        if(song.volume <= 0 ) song.stop();
+        console.log(`${song.volume}`)
     }
 }
