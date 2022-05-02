@@ -24,8 +24,8 @@ class Tongue {
                 from: 0, 
                 to: {value: () => {return this.distance}},
             },
-            ease: 'Quad.easeIn',
-            duration: 200,
+            ease: 'power4',
+            duration: 40,
             repeat: 0,
             onStart: () => {this.animPlaying = true;},
             onComplete: () => {
