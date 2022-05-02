@@ -37,6 +37,7 @@ class Death extends Phaser.Scene {
         this.chameleon = this.add.image(game.config.width/2, 210, 'death_chameleon').setOrigin(0.5,0).setScale(2);
         this.wings = this.add.image(this.chameleon.x + 38, 164, 'death_wings').setOrigin(0.5,0).setScale(2);
         this.died = this.add.image(game.config.width/2, game.config.height - 208, 'death_msg').setOrigin(0.5,0).setScale(1.8).setAlpha(0);
+        
         this.tweens.add({
             targets: this.died,
             alpha: {value: 1, duration: 4000, ease: 'Power1'},
@@ -47,6 +48,8 @@ class Death extends Phaser.Scene {
             delay: 100,
         })
 
+        this.deathSong = this.sound.add('song_death');
+        this.deathSong.play();
 
         let button1Pad = 276 * 2;
         let button1 = this.add.image(game.config.width/2, button1Pad, 'button2').setOrigin(0.5, 0.5).setScale(2);

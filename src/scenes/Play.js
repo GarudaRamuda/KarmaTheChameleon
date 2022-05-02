@@ -30,7 +30,7 @@ class Play extends Phaser.Scene {
         this.loopSong = this.sound.add('song_loop', {loop: true});
 
         this.introSong.play();
-        this.introSong.once('complete', () => {this.loopSong.play();});
+        this.introSong.once('complete', () => {if(!this.dead) this.loopSong.play();});
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
@@ -101,6 +101,9 @@ class Play extends Phaser.Scene {
         while (this.accumulator >= this.matterTimeStep) {
             if(this.dead) {
                 this.volumeFade(this.loopSong);
+                this.volumeFade(this.soundFireClose);
+                this.volumeFade(this.soundFireMed);
+                this.volumeFade(this.soundFireFar);
             }
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
@@ -114,10 +117,12 @@ class Play extends Phaser.Scene {
             this.updateScore();
 
             // check if dead
-            if (this.p1.y >= config.height) { // touching bottom
+            if (this.p1.y >= config.height + 40) { // touching bottom
                 this.dead = true;
-                
-                setTimeout(() => {this.scene.start('death', {score: this.distance})}, 1500);
+                setTimeout(() => {
+                    this.sound.stopAll();
+                    this.scene.start('death', {score: this.distance});
+                }, 1500);
             }
             // touching fire
 
@@ -206,6 +211,7 @@ class Play extends Phaser.Scene {
 
     volumeFade(song, time = 1){
         song.setVolume(song.volume - (1/(60*time)));
+        if(song.volume <= 0 ) song.stop();
         console.log(`${song.volume}`)
     }
 }
