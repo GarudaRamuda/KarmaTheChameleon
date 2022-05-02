@@ -36,7 +36,13 @@ class Load extends Phaser.Scene {
         this.load.image('menu', './assets/menubg.png');
         this.load.image('logo', './assets/logo.png');
         this.load.image('button', './assets/button.png');
-        this.load.image('death_image', './assets/death.png');
+
+        // Death screen
+        this.load.image('button2', './assets/button2.png');
+        this.load.image('death_bg', './assets/death_bg.png');
+        this.load.image('death_chameleon', './assets/deadChameleon.png');
+        this.load.image('death_wings', './assets/wings.png');
+        this.load.image('death_msg', './assets/youDied.png');
     }
 
     create() {
