@@ -21,8 +21,8 @@ class Play extends Phaser.Scene {
 
         //declare different object types
         this.objectProtos = [
-            {spawn: () => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
-            {spawn: () => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
+            {spawn: (a) => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right + a, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
+            {spawn: (b) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150 + b, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
         ];
 
         //declare starting objects in array
@@ -112,17 +112,28 @@ class Play extends Phaser.Scene {
             this.hasSpawned = false;
             return null;
         }
-        console.log(`${this.hasSpawned}`)
+        //console.log(`${this.hasSpawned}`)
         if(!this.hasSpawned) {
             this.hasSpawned = true;
-            this.spawnNewObject();
+            this.spawnNewObject(this.scaleDifficulty(this.distance));
         }
     }
 
-    spawnNewObject() {
+    scaleDifficulty(x) {
+        // just for testing
+        if (x > 10) {
+            return 100;
+        } 
+        else if (x > 20) {
+            return 800;
+        }
+        return 0;
+    }
+
+    spawnNewObject(x) {
         let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));
-        console.log(`Selection: ${selection}`);
-        this.objectProtos[selection].spawn();
+        // console.log(`Selection: ${selection}`);
+        this.objectProtos[selection].spawn(x);
     }
 
     // Code copied from developer.mozilla.org
