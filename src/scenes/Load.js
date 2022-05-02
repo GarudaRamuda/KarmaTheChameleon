@@ -50,6 +50,9 @@ class Load extends Phaser.Scene {
         this.load.audio('song_loop', './assets/Music/Song Loop.wav')
         this.load.audio('sound_birds', './assets/sounds/Sound_birds.wav');
         this.load.audio('sound_jungle', './assets/sounds/Sound_jungle.wav');
+        this.load.audio('sound_fire_close', './assets/sounds/Sound_Fire_Close.wav');
+        this.load.audio('sound_fire_med', './assets/sounds/Sound_Fire_Med.wav');
+        this.load.audio('sound_fire_far', './assets/sounds/Sound_Fire_Far.wav');
     }
 
     create() {

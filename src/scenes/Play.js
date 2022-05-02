@@ -16,7 +16,15 @@ class Play extends Phaser.Scene {
         this.tongue = new Tongue(this, 'spr_tongue');
         this.spawnGap = 6;
         this.hasSpawned = false;
+        this.dead = false;
 
+        this.soundFireClose = this.sound.add('sound_fire_close', {loop:true});
+        this.soundFireMed = this.sound.add('sound_fire_med', {loop:true});
+        this.soundFireFar = this.sound.add('sound_fire_far', {loop:true});
+
+        this.soundFireClose.play();
+        this.soundFireMed.play();
+        this.soundFireFar.play();
         
         this.introSong = this.sound.add('song_intro');
         this.loopSong = this.sound.add('song_loop', {loop: true});
@@ -91,6 +99,9 @@ class Play extends Phaser.Scene {
     update(time, delta) {   
         this.accumulator += delta;
         while (this.accumulator >= this.matterTimeStep) {
+            if(this.dead) {
+                this.volumeFade(this.loopSong);
+            }
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
             this.p1.maxVelocityX = Math.floor(this.distance/100) + 4
@@ -104,7 +115,9 @@ class Play extends Phaser.Scene {
 
             // check if dead
             if (this.p1.y >= config.height) { // touching bottom
-                this.scene.start('death', {score: this.distance});
+                this.dead = true;
+                
+                setTimeout(() => {this.scene.start('death', {score: this.distance})}, 1500);
             }
             // touching fire
 
@@ -189,5 +202,10 @@ class Play extends Phaser.Scene {
         //Create parralax amount
         if(offsetAmount == 0) return null;
         tileSprite.tilePositionX = worldView.x/offsetAmount;
+    }
+
+    volumeFade(song, time = 1){
+        song.setVolume(song.volume - (1/(60*time)));
+        console.log(`${song.volume}`)
     }
 }
