@@ -11,6 +11,7 @@ class Play extends Phaser.Scene {
         this.bg_far = this.add.tileSprite(0,0, 528, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
         this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
+        this.bg_trees = this.add.tileSprite(0,0, 528, 288, 'img_bg_trees').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
         this.tongueImg = this.add.image(50, 50, 'spr_tongue');
         this.tongue = new Tongue(this, 'spr_tongue');
@@ -63,7 +64,7 @@ class Play extends Phaser.Scene {
         let scoreConfig = {
             fontFamily: 'stockyPixels',
             fontSize: '16px',
-            color: '#377592',
+            color: '#f5ffe8',
             align: 'right',
             padding: {
                 top: 5,
@@ -167,8 +168,9 @@ class Play extends Phaser.Scene {
         
         this.parallaxAmount(this.bg_far);
         this.parallaxAmount(this.bg_mid2, 3.3);
-        this.parallaxAmount(this.bg_mid, 2.7);
-        this.parallaxAmount(this.bg_close, 2.3);
+        this.parallaxAmount(this.bg_mid, 2.4);
+        this.parallaxAmount(this.bg_trees, 1.9);
+        this.parallaxAmount(this.bg_close, 1.8);
     }
 
     // Function that takes a tilesprite and has it parallax based off of a given amount
