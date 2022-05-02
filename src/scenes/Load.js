@@ -50,7 +50,7 @@ class Load extends Phaser.Scene {
         this.load.audio('song_drums', './assets/Music/Menu_Loop.ogg');
         this.load.audio('song_intro', './assets/Music/Song_Intro.ogg');
         this.load.audio('song_loop', './assets/Music/Song_Loop.ogg');
-        this.load.audio('song_death', './assets/Music/Song_Death.ogg')
+        this.load.audio('song_death', './assets/Music/Song_death.ogg')
         this.load.audio('sound_birds', './assets/sounds/Sound_Birds.ogg');
         this.load.audio('sound_jungle', './assets/sounds/Sound_Jungle.ogg');
         this.load.audio('sound_fire_close', './assets/sounds/Sound_Fire_Close.ogg');
