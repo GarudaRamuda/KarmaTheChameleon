@@ -21,8 +21,8 @@ class Play extends Phaser.Scene {
 
         //declare different object types
         this.objectProtos = [
-            {spawn: (a) => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right + a, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
-            {spawn: (b) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150 + b, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
+            {spawn: (x, y) => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right + x, 100 + y, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
+            {spawn: (x, y) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150 + x, config.height + 50 + y, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
         ];
 
         //declare starting objects in array
@@ -115,25 +115,35 @@ class Play extends Phaser.Scene {
         //console.log(`${this.hasSpawned}`)
         if(!this.hasSpawned) {
             this.hasSpawned = true;
-            this.spawnNewObject(this.scaleDifficulty(this.distance));
+            this.spawnNewObject();
         }
     }
 
     scaleDifficulty(x) {
-        // just for testing
-        if (x > 10) {
+        if (x > 100) {
             return 100;
-        } 
-        else if (x > 20) {
-            return 800;
+        }
+        else if (x > 250) {
+            return 300;
+        }
+        else if (x > 500) {
+            return 500;
+        }
+        else if (x > 1000) {
+            return 700;
         }
         return 0;
     }
 
-    spawnNewObject(x) {
+    changeObjectHeight() {
+        return Math.floor(Math.random() * 25);
+    }
+
+    spawnNewObject() {
         let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));
         // console.log(`Selection: ${selection}`);
-        this.objectProtos[selection].spawn(x);
+        this.objectProtos[selection].spawn(this.scaleDifficulty(this.distance), this.changeObjectHeight());
+        // console.log(this.objectArray[selection]);
     }
 
     // Code copied from developer.mozilla.org
