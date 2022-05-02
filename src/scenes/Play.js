@@ -16,8 +16,11 @@ class Play extends Phaser.Scene {
         this.tongue = new Tongue(this, 'spr_tongue');
         this.spawnGap = 6;
         this.hasSpawned = false;
+
+        
         this.introSong = this.sound.add('song_intro');
         this.loopSong = this.sound.add('song_loop', {loop: true});
+
         this.introSong.play();
         this.introSong.once('complete', () => {this.loopSong.play();});
 

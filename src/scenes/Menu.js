@@ -28,6 +28,13 @@ class Menu extends Phaser.Scene {
         button2.setInteractive();        
         this.add.text(game.config.width/2, button1.y + 2, 'PLAY!', menuConfig).setOrigin(0.5);
         this.add.text(game.config.width/2, button2.y + 2, 'QUIT', menuConfig).setOrigin(0.5);
+
+        this.birdSounds = this.sound.add('sound_birds', {loop: true});
+        this.birdSounds.play();
+
+        this.jungleSound = this.sound.add('sound_jungle', {loop: true});
+        this.jungleSound.play();
+
         this.menuSong = this.sound.add('song_drums', {loop: true});
         this.menuSong.play();
 
