@@ -210,6 +210,7 @@ class Play extends Phaser.Scene {
 
     // Function that takes a tilesprite and has it parallax based off of a given amount
     // Not entirely sure how the offset amount works, but setting it to 2 seems to lock it to the camera
+    // 0-2 offset is foreground 2 is playspace 2->inf is background
     parallaxAmount(tileSprite, offsetAmount = 0) {
         // lock tilesprite to camera
         let worldView = this.cameras.main.worldView;
