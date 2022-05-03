@@ -46,7 +46,7 @@ class Fire {
     updateSprites() {
         //this.debugLine.setPosition(this.x, 0);
         this.bodyFire.setPosition(this.x + 200, this.y+ 6);
-        this.fire_aura.setPosition(this.x, this.y);
+        this.fire_aura.setPosition(this.x - 100, this.y);
     }
 
     clamp(value, min, max) {

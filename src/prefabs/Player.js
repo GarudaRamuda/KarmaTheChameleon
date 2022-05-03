@@ -181,10 +181,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
 
-        if (this.isGrappled) {
-            this.rotateAroundPoint();
-        }
-        
         const velocity = this.body.velocity;
         if (this.isTouching.bottom) {
             if(this.lastGrounded != this.coyoteTime) {
@@ -275,12 +271,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         let drag = this.dragForce;
         //console.log(`velocity: ${this.body.velocity.x}, drag: ${drag}`);
         this.applyForce({x:-drag, y: 0});
-    }
-
-    rotateAroundPoint() {
-        // psuedocode
-        // find angle and radius away from grapple point
-        // Rotate counter clockwise around circle until player ungrapples
     }
 
     onSensorCollide(event) {
