@@ -25,15 +25,6 @@ class Play extends Phaser.Scene {
         this.jungleSound = this.sound.add('sound_jungle', {loop: true});
         this.jungleSound.play();
 
-
-        this.soundFireClose = this.sound.add('sound_fire_close', {loop:true});
-        this.soundFireMed = this.sound.add('sound_fire_med', {loop:true});
-        this.soundFireFar = this.sound.add('sound_fire_far', {loop:true});
-
-        this.soundFireClose.play();
-        this.soundFireMed.play();
-        this.soundFireFar.play();
-        
         this.introSong = this.sound.add('song_intro');
         this.loopSong = this.sound.add('song_loop', {loop: true});
 
@@ -109,11 +100,9 @@ class Play extends Phaser.Scene {
         while (this.accumulator >= this.matterTimeStep) {
             if(this.dead) {
                 this.volumeFade(this.loopSong);
-                this.volumeFade(this.soundFireClose);
-                this.volumeFade(this.soundFireMed);
-                this.volumeFade(this.soundFireFar);
                 this.volumeFade(this.birdSounds);
                 this.volumeFade(this.jungleSound);
+                this.Fire.endSound();
             }
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
