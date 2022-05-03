@@ -1,11 +1,11 @@
 class Fire {
     constructor(scene) {
         this.scene = scene;
-        this.x = -200;
+        this.x = -1000;
         this.y = config.height;
         this.velocityX = 1;
         this.distance = 0;
-        this.maxDistFromScreen = 250;
+        this.maxDistFromScreen = 500;
 
         this.soundFireClose = scene.sound.add('sound_fire_close', {loop:true});
         this.soundFireMed = scene.sound.add('sound_fire_med', {loop:true});
@@ -15,7 +15,7 @@ class Fire {
         this.soundFireMed.play();
         this.soundFireFar.play();
         
-        this.fire_aura = scene.add.image(this.x, this.y, 'img_fire_aura').setOrigin(0.5,1).setScale(2);
+        this.fire_aura = scene.add.image(this.x, this.y, 'img_fire_aura').setOrigin(0.5,1).setScale(2).setDepth(3);
         this.fire_aura.setBlendMode(Phaser.BlendModes.COLOR);
 
         //load fire animation
@@ -33,10 +33,10 @@ class Fire {
         this.distance = Phaser.Math.Distance.Between(this.x, 0, worldView.left, 0);
         if(this.distance > this.maxDistFromScreen && this.x < worldView.left) this.x = worldView.left - this.maxDistFromScreen;
         //console.log(this.distance);
-        let futureVel = -(50 / distance)  + player.maxVelocityX;
+        let futureVel = -(50 / distance)  + 6;
         this.x += this.velocityX;
-        if(distance > 0 && futureVel > 0) this.velocityX = futureVel;
-        else this.velocityX = 3;
+        if(distance > 0 && futureVel > 0) (this.velocityX = futureVel);
+        else this.velocityX = 1;
         //console.log(this.velocityX);
         this.updateSprites();
         this.setVolume(this.soundFireClose, 100, 0, worldView);
