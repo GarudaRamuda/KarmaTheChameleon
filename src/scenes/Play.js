@@ -19,10 +19,11 @@ class Play extends Phaser.Scene {
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
 
-        //declare different object types
-        this.objectProtos = [
+        // declare different object types
+        // branch_sm has +100 for x-coordinate so it spawns in offscreen
+        this.objectProtos = [            
+            {spawn: (x, y) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 100 + x, config.height + 50 + y, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true))},            
             {spawn: (x, y) => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right + x, 100 + y, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
-            {spawn: (x, y) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + x, config.height + 50 + y, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true))},            
         ];
 
         //declare starting objects in array
@@ -79,7 +80,8 @@ class Play extends Phaser.Scene {
         this.offsetx = 125;
         this.score = this.add.text(100, scorePad + 2, 'DISTANCE ' + this.distance, scoreConfig).setOrigin(0, 0.5);
 
-        this.tracker = 10;
+        // track x-cord of object and distance scaling
+        this.objCoordTracker = 10;
         this.scale_dist = 0;
     }
 
@@ -111,6 +113,7 @@ class Play extends Phaser.Scene {
         }
     }
 
+    // control spawning objects
     spawnController() {
         if (Math.floor(this.distance % this.spawnGap) != 5) {
             this.hasSpawned = false;
@@ -119,19 +122,23 @@ class Play extends Phaser.Scene {
         //console.log(`${this.hasSpawned}`)
         if(!this.hasSpawned && this.okToSpawn()) {
             this.hasSpawned = true;
-            console.log("Spawning");
+            // console.log("Spawning");
             this.spawnNewObject();
         }
     }
 
+    // check if ready to spawn
     okToSpawn() {        
-        if ((this.distance - this.tracker) > this.scale_dist) {
-            console.log("True");
+        if ((this.distance - this.objCoordTracker) > this.scale_dist) {
+            // console.log("True");
             return true;
         }
         return false;
     }
 
+
+    // scale distance
+    // 7+ creates gaps you cant jump across
     scaleDifficulty(x) {
         if (x < 10) {
             return 1;
@@ -139,37 +146,54 @@ class Play extends Phaser.Scene {
         else if (x < 100) {
             return 2;
         }
-        else if (x < 200) {
+        else if (x < 250) {
             return 3;
         }
-        else if (x < 500) {
+        else if (x < 350) {
             return 4;
+        }
+        else if (x < 450) {
+            return 5;
+        }
+        else if (x < 500) {
+            return 6;
         }
         return 0;
     }
 
+    // randomize Y height of objects
     changeObjectHeight() {
         return Math.floor(Math.random() * 25);
     }
 
     spawnNewObject() {
-        let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));        
+        // let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));        
+        let selection = this.rand75(); // 75% chance of spawning branch
+        console.log("S: ", selection);
         this.scale_dist = this.scaleDifficulty(this.distance);
-        console.log(this.distance + this.scale_dist);
-        this.tracker = this.distance;
+        // console.log(this.distance + this.scale_dist);
+        this.objCoordTracker = this.distance;
         this.objectProtos[selection].spawn(this.scale_dist, this.changeObjectHeight());
-        
-        // 
-        //selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));
-
     }
+
+    // rand50() and rand75() copied from: geeksforgeeks.org
+    // https://www.geeksforgeeks.org/generate-0-1-25-75-probability/
+    rand50() {
+        return Math.floor(Math.random() * 10) & 1;
+    }
+     
+    rand75() {
+        return this.rand50() | this.rand50();
+    }
+     
 
     // Code copied from developer.mozilla.org
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
-    getRandomArbitrary(min, max) {
-        return Math.random() * (max - min) + min;
-    }
+    // getRandomArbitrary(min, max) {
+    //     return Math.random() * (max - min) + min;
+    // }
 
+    // update scoreboard
     updateScore() {
         this.score.x = this.cameras.main.worldView.left + this.offsetx - 108;
         this.distance = (this.p1.x - 100) / 64 ;
