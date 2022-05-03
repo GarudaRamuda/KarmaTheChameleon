@@ -15,6 +15,8 @@ class Fire {
         this.soundFireMed.play();
         this.soundFireFar.play();
         
+        this.fire_aura = scene.add.image(this.x, this.y, 'img_fire_aura').setOrigin(0.5,1).setScale(2);
+        this.fire_aura.setBlendMode(Phaser.BlendModes.COLOR);
 
         //load fire animation
         this.bodyFire = scene.add.sprite(this.x, this.y + 6,'body_fire').setOrigin(1,1).setScale(2).setDepth(2);
@@ -30,7 +32,7 @@ class Fire {
     update(distance, player, worldView) {
         this.distance = Phaser.Math.Distance.Between(this.x, 0, worldView.left, 0);
         if(this.distance > this.maxDistFromScreen && this.x < worldView.left) this.x = worldView.left - this.maxDistFromScreen;
-        console.log(this.distance);
+        //console.log(this.distance);
         let futureVel = -(50 / distance)  + player.maxVelocityX;
         this.x += this.velocityX;
         if(distance > 0 && futureVel > 0) this.velocityX = futureVel;
@@ -44,6 +46,7 @@ class Fire {
     updateSprites() {
         //this.debugLine.setPosition(this.x, 0);
         this.bodyFire.setPosition(this.x + 200, this.y+ 6);
+        this.fire_aura.setPosition(this.x, this.y);
     }
 
     clamp(value, min, max) {
@@ -54,7 +57,7 @@ class Fire {
         let volume = 0;
         if(this.x < worldView.left) volume = this.clamp((fadeOut - this.distance) / (fadeOut - fadeIn), 0, 1);
         else volume = 1;
-        console.log(`${song.key}: Volume: ${volume}`)
+        //console.log(`${song.key}: Volume: ${volume}`)
         song.setVolume(volume);
     }
 
