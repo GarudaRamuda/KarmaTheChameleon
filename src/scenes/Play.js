@@ -22,7 +22,7 @@ class Play extends Phaser.Scene {
         //declare different object types
         this.objectProtos = [
             {spawn: (x, y) => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right + x, 100 + y, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
-            {spawn: (x, y) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150 + x, config.height + 50 + y, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58))},
+            {spawn: (x, y) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + x, config.height + 50 + y, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true))},            
         ];
 
         //declare starting objects in array
@@ -78,6 +78,9 @@ class Play extends Phaser.Scene {
         this.distance = 0;
         this.offsetx = 125;
         this.score = this.add.text(100, scorePad + 2, 'DISTANCE ' + this.distance, scoreConfig).setOrigin(0, 0.5);
+
+        this.tracker = 10;
+        this.scale_dist = 0;
     }
 
 
@@ -103,6 +106,7 @@ class Play extends Phaser.Scene {
             this.destroyOffScreen();
             this.parallaxBGs();
             this.matter.world.step(this.matterTimeStep);
+            this.okToSpawn();
             this.spawnController();
         }
     }
@@ -113,24 +117,33 @@ class Play extends Phaser.Scene {
             return null;
         }
         //console.log(`${this.hasSpawned}`)
-        if(!this.hasSpawned) {
+        if(!this.hasSpawned && this.okToSpawn()) {
             this.hasSpawned = true;
+            console.log("Spawning");
             this.spawnNewObject();
         }
     }
 
+    okToSpawn() {        
+        if ((this.distance - this.tracker) > this.scale_dist) {
+            console.log("True");
+            return true;
+        }
+        return false;
+    }
+
     scaleDifficulty(x) {
-        if (x > 100) {
-            return 100;
+        if (x < 10) {
+            return 1;
         }
-        else if (x > 250) {
-            return 300;
+        else if (x < 100) {
+            return 2;
         }
-        else if (x > 500) {
-            return 500;
+        else if (x < 200) {
+            return 3;
         }
-        else if (x > 1000) {
-            return 700;
+        else if (x < 500) {
+            return 4;
         }
         return 0;
     }
@@ -140,10 +153,15 @@ class Play extends Phaser.Scene {
     }
 
     spawnNewObject() {
-        let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));
-        // console.log(`Selection: ${selection}`);
-        this.objectProtos[selection].spawn(this.scaleDifficulty(this.distance), this.changeObjectHeight());
-        // console.log(this.objectArray[selection]);
+        let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));        
+        this.scale_dist = this.scaleDifficulty(this.distance);
+        console.log(this.distance + this.scale_dist);
+        this.tracker = this.distance;
+        this.objectProtos[selection].spawn(this.scale_dist, this.changeObjectHeight());
+        
+        // 
+        //selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));
+
     }
 
     // Code copied from developer.mozilla.org
