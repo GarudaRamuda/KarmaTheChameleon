@@ -18,25 +18,6 @@ class Play extends Phaser.Scene {
         this.spawnGap = 6;
         this.hasSpawned = false;
         this.dead = false;
-
-        //load fire animation
-        this.bodyFire = this.add.sprite(0,config.height+6,'body_fire').setOrigin(1,1).setScale(2);
-        this.anims.create({
-            key: 'burn!!',
-            frames: this.anims.generateFrameNumbers('body_fire', {start: 0, end: 59, first: 0}),
-            frameRate: 60,
-            repeat: -1
-        });
-        this.bodyFire.play('burn!!');
-        this.sideFire = this.add.sprite(0,config.height+6,'side_fire').setOrigin(0,1).setScale(2);
-        this.anims.create({
-            key: 'burn!',
-            frames: this.anims.generateFrameNumbers('side_fire', {start: 0, end: 59, first: 0}),
-            frameRate: 60,
-            repeat: -1
-        });
-        this.sideFire.play('burn!');
-        
         
         this.birdSounds = this.sound.add('sound_birds', {loop: true});
         this.birdSounds.play();
@@ -44,15 +25,6 @@ class Play extends Phaser.Scene {
         this.jungleSound = this.sound.add('sound_jungle', {loop: true});
         this.jungleSound.play();
 
-
-        this.soundFireClose = this.sound.add('sound_fire_close', {loop:true});
-        this.soundFireMed = this.sound.add('sound_fire_med', {loop:true});
-        this.soundFireFar = this.sound.add('sound_fire_far', {loop:true});
-
-        this.soundFireClose.play();
-        this.soundFireMed.play();
-        this.soundFireFar.play();
-        
         this.introSong = this.sound.add('song_intro');
         this.loopSong = this.sound.add('song_loop', {loop: true});
 
@@ -119,6 +91,7 @@ class Play extends Phaser.Scene {
         this.distance = 0;
         this.offsetx = 125;
         this.score = this.add.text(100, scorePad + 2, 'DISTANCE ' + this.distance, scoreConfig).setOrigin(0, 0.5);
+        this.Fire = new Fire(this);
     }
 
 
@@ -127,11 +100,9 @@ class Play extends Phaser.Scene {
         while (this.accumulator >= this.matterTimeStep) {
             if(this.dead) {
                 this.volumeFade(this.loopSong);
-                this.volumeFade(this.soundFireClose);
-                this.volumeFade(this.soundFireMed);
-                this.volumeFade(this.soundFireFar);
                 this.volumeFade(this.birdSounds);
                 this.volumeFade(this.jungleSound);
+                this.Fire.endSound();
             }
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
@@ -145,7 +116,7 @@ class Play extends Phaser.Scene {
             this.updateScore();
 
             // check if dead
-            if (this.p1.y >= config.height + 40) { // touching bottom
+            if (this.p1.y >= config.height + 40 || this.p1.x <= this.Fire.x) { // touching bottom
                 this.dead = true;
                 setTimeout(() => {
                     this.sound.stopAll();
@@ -158,8 +129,7 @@ class Play extends Phaser.Scene {
             this.destroyOffScreen();
             this.parallaxBGs();
             this.spawnController();
-            this.sideFire.x = this.cameras.main.worldView.left - 30;
-            this.bodyFire.x = this.cameras.main.worldView.left + 200;
+            this.Fire.update(this.distance, this.p1 ,this.cameras.main.worldView);
 
             this.matter.world.step(this.matterTimeStep);
         }
@@ -245,6 +215,6 @@ class Play extends Phaser.Scene {
     volumeFade(song, time = 1){
         song.setVolume(song.volume - (1/(60*time)));
         if(song.volume <= 0 ) song.stop();
-        console.log(`${song.volume}`)
+        //console.log(`${song.volume}`)
     }
 }
