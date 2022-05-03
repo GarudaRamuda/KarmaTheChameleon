@@ -13,6 +13,10 @@ let config = {
             }*/
         }
     },
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH,
+    },
     pixelArt: true,
     fps: {
         target: 60,
@@ -22,7 +26,7 @@ let config = {
     callbacks: {
         postBoot: function (game) {
           // In v3.15, you have to override Phaser's default styles
-          game.canvas.style.width = '85%';
+          game.canvas.style.width = '100%';
           game.canvas.style.height = '100%';
         }
     }
