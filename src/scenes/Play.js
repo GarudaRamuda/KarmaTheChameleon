@@ -42,7 +42,7 @@ class Play extends Phaser.Scene {
         //declare starting objects in array
         let branch1 = new GrappleBranch(this, this.matter.world, 500, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
         let branch_lg = this.matter.add.image(100, config.height, 'branch_lg', null, { restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
-        let branch_sm = this.matter.add.image(900, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
+        let branch_sm = this.matter.add.image(900, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true);
         this.objectArray = [
             branch1,
             branch_sm,
