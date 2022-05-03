@@ -116,7 +116,7 @@ class Play extends Phaser.Scene {
             this.updateScore();
 
             // check if dead
-            if (this.p1.y >= config.height + 40 || this.p1.x <= this.Fire.x) { // touching bottom
+            if ((this.p1.y >= config.height + 40 || this.p1.x <= this.Fire.x) && !this.dead) { // touching bottom
                 this.dead = true;
                 setTimeout(() => {
                     this.sound.stopAll();
