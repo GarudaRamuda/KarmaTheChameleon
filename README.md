@@ -2,6 +2,8 @@
 
 By: James Jek, Martin Perina, and Nick Pastoria
 
+![Promo Image](Promo.png)
+
 Created for CMPM and ARTG 120 "Endless Runner Project" during Spring of 2022.
 
 We were tasked with creating and endless runner in phaser under a two week time limit.
