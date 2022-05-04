@@ -37,8 +37,8 @@ class Play extends Phaser.Scene {
         // declare different object types
         // branch_sm has +100 for x-coordinate so it spawns in offscreen
         this.objectProtos = [            
-            {spawn: (x, y) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 100 + x, config.height + 50 + y, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true))},            
-            {spawn: (x, y) => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right + x, 100 + y, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
+            {spawn: (x, y) => this.objectArray.push(this.matter.add.image(this.cameras.main.worldView.right + 150 + x, config.height + 50 + y, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true))},            
+            {spawn: (x, y) => this.objectArray.push(new GrappleBranch(this, this.matter.world, this.cameras.main.worldView.right + x + 20, 100 + y, 'grappleBranch', null, {isStatic: true, isSensor: true,}))},
         ];
 
         //declare starting objects in array
