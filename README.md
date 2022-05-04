@@ -2,7 +2,7 @@
 
 By: James Jek, Martin Perina, and Nick Pastoria
 
-![Promo Image](Promo.png)
+![Promo Image](web_assets/Promo.png)
 
 Created for CMPM and ARTG 120 "Endless Runner Project" during Spring of 2022.
 
