@@ -11,13 +11,28 @@ class Play extends Phaser.Scene {
         this.bg_far = this.add.tileSprite(0,0, 528, 288, 'img_bg_far').setOrigin(0,0).setScale(2);
         this.bg_mid2 = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid2').setOrigin(0,0).setScale(2);
         this.bg_mid = this.add.tileSprite(0,0, 528, 288, 'img_bg_mid').setOrigin(0,0).setScale(2);
+        this.bg_trees = this.add.tileSprite(0,0, 528, 288, 'img_bg_trees').setOrigin(0,0).setScale(2);
         this.bg_close = this.add.tileSprite(0,0, 528, 288, 'img_bg_close').setOrigin(0,0).setScale(2);
         this.tongueImg = this.add.image(50, 50, 'spr_tongue');
         this.tongue = new Tongue(this, 'spr_tongue');
         this.spawnGap = 6;
         this.hasSpawned = false;
+        this.dead = false;
+        
+        this.birdSounds = this.sound.add('sound_birds', {loop: true});
+        this.birdSounds.play();
+
+        this.jungleSound = this.sound.add('sound_jungle', {loop: true});
+        this.jungleSound.play();
+
+        this.introSong = this.sound.add('song_intro');
+        this.loopSong = this.sound.add('song_loop', {loop: true});
+
+        this.introSong.play();
+        this.introSong.once('complete', () => {if(!this.dead) this.loopSong.play();});
 
         this.p1 = new Player(this, this.matter.world, 100, config.height/2, 'collision'); // do we need setOrigin?
+
 
         // declare different object types
         // branch_sm has +100 for x-coordinate so it spawns in offscreen
@@ -29,7 +44,7 @@ class Play extends Phaser.Scene {
         //declare starting objects in array
         let branch1 = new GrappleBranch(this, this.matter.world, 500, 100, 'grappleBranch', null, {isStatic: true, isSensor: true,});
         let branch_lg = this.matter.add.image(100, config.height, 'branch_lg', null, { restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
-        let branch_sm = this.matter.add.image(900, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58);
+        let branch_sm = this.matter.add.image(900, config.height + 50, 'branch_sm', null, {restitution: 0, isStatic: true,}).setScale(2).setOrigin(0.5, 0.58).setFlipX(true);
         this.objectArray = [
             branch1,
             branch_sm,
@@ -40,7 +55,6 @@ class Play extends Phaser.Scene {
         this.tweens.add({
             targets: this.keyGuide,
             alpha: {value: 1, duration: 1000, ease: 'Power4'},
-            y: {from: this.keyGuide.y + 30, to: this.keyGuide.y},
             duration: 1500,
             ease: 'Power4',
             repeat: 0,
@@ -65,7 +79,7 @@ class Play extends Phaser.Scene {
         let scoreConfig = {
             fontFamily: 'stockyPixels',
             fontSize: '16px',
-            color: '#377592',
+            color: '#f5ffe8',
             align: 'right',
             padding: {
                 top: 5,
@@ -83,14 +97,24 @@ class Play extends Phaser.Scene {
         // track x-cord of object and distance scaling
         this.objCoordTracker = 10;
         this.scale_dist = 0;
+      
+        this.Fire = new Fire(this);
     }
 
 
     update(time, delta) {   
         this.accumulator += delta;
         while (this.accumulator >= this.matterTimeStep) {
+            if(this.dead) {
+                this.volumeFade(this.loopSong);
+                this.volumeFade(this.birdSounds);
+                this.volumeFade(this.jungleSound);
+                this.Fire.endSound();
+            }
             this.accumulator -= this.matterTimeStep;
             this.p1.update();
+            this.p1.maxVelocityX = Math.floor(this.distance/100) + 4
+            //console.log(`Max speed: ${this.p1.maxVelocityX}`);
             this.keyGuide.x = this.p1.x;
             this.keyGuide.y += (this.p1.body.position.y - this.p1.body.positionPrev.y);
             this.tongue.track(this.p1);
@@ -99,17 +123,26 @@ class Play extends Phaser.Scene {
             this.updateScore();
 
             // check if dead
-            if (this.p1.y >= config.height) { // touching bottom
-                this.scene.start('death', {score: this.distance});
+            if ((this.p1.y >= config.height + 40 || this.p1.x <= this.Fire.x) && !this.dead) { // touching bottom
+                this.dead = true;
+                setTimeout(() => {
+                    this.sound.stopAll();
+                    this.scene.start('death', {score: this.distance});
+                }, 1500);
             }
             // touching fire
 
             //check if platforms are outside the screen and handle the behavior for that
             this.destroyOffScreen();
             this.parallaxBGs();
+
             this.matter.world.step(this.matterTimeStep);
             this.okToSpawn();
+
             this.spawnController();
+            this.Fire.update(this.distance, this.p1 ,this.cameras.main.worldView);
+
+            this.matter.world.step(this.matterTimeStep);
         }
     }
 
@@ -120,6 +153,7 @@ class Play extends Phaser.Scene {
             return null;
         }
         //console.log(`${this.hasSpawned}`)
+
         if(!this.hasSpawned && this.okToSpawn()) {
             this.hasSpawned = true;
             // console.log("Spawning");
@@ -228,13 +262,15 @@ class Play extends Phaser.Scene {
     parallaxBGs() {
         
         this.parallaxAmount(this.bg_far);
-        this.parallaxAmount(this.bg_mid2, 3.3);
-        this.parallaxAmount(this.bg_mid, 2.7);
-        this.parallaxAmount(this.bg_close, 2.3);
+        this.parallaxAmount(this.bg_mid2, 4);
+        this.parallaxAmount(this.bg_mid, 2.4);
+        this.parallaxAmount(this.bg_trees, 2.2);
+        this.parallaxAmount(this.bg_close, 2.1);
     }
 
     // Function that takes a tilesprite and has it parallax based off of a given amount
     // Not entirely sure how the offset amount works, but setting it to 2 seems to lock it to the camera
+    // 0-2 offset is foreground 2 is playspace 2->inf is background
     parallaxAmount(tileSprite, offsetAmount = 0) {
         // lock tilesprite to camera
         let worldView = this.cameras.main.worldView;
@@ -243,5 +279,11 @@ class Play extends Phaser.Scene {
         //Create parralax amount
         if(offsetAmount == 0) return null;
         tileSprite.tilePositionX = worldView.x/offsetAmount;
+    }
+
+    volumeFade(song, time = 1){
+        song.setVolume(song.volume - (1/(60*time)));
+        if(song.volume <= 0 ) song.stop();
+        //console.log(`${song.volume}`)
     }
 }

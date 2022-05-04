@@ -54,7 +54,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.grappleForce = .0007;
         this.grapplePush = 0.003;
 
-        this.jumpHeight = 11;
+        this.jumpHeight = 9;
         
         //Apex Floating Variables
         this.maxUpwardForce = 0.006;
@@ -62,11 +62,11 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.terminatingVelocity = 3;
 
         // Value to apply additional force to player after releasing grapple
-        this.yBoost = 0.07;
+        this.yBoost = 0.03;
         this.grappleReleaseForce = 0.03;
         this.canBoost = false;
 
-        this.maxVelocityX = 7;
+        this.maxVelocityX = 5;
         this.dragForce = 0.003;
 
         // Track when sensors are touching something
@@ -181,10 +181,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
         if (this.jumpBuffer > 0) this.jumpBuffer -= 1;
 
-        if (this.isGrappled) {
-            this.rotateAroundPoint();
-        }
-        
         const velocity = this.body.velocity;
         if (this.isTouching.bottom) {
             if(this.lastGrounded != this.coyoteTime) {
@@ -277,12 +273,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         this.applyForce({x:-drag, y: 0});
     }
 
-    rotateAroundPoint() {
-        // psuedocode
-        // find angle and radius away from grapple point
-        // Rotate counter clockwise around circle until player ungrapples
-    }
-
     onSensorCollide(event) {
         let pairs = event.pairs;
         for (var i = 0; i < pairs.length; i++)
@@ -327,6 +317,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
                 // Check that the clicked body is considered grapplable
                 if (this.grappleTargets[i] != null && this.grappleTargets[i].label == 'grapplable') {
                     let body = this.grappleTargets[i];
+                    body.parent.jiggle();
                     // Divide ropeLength by a number greater than 1 to give the player some leeway if they grapple from the ground
                     let ropeLength = Phaser.Math.Distance.BetweenPoints(body.position, this);
 
