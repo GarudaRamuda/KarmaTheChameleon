@@ -16,7 +16,6 @@ class Fire {
         this.soundFireFar.play();
         
         this.fire_aura = scene.add.image(this.x, this.y, 'img_fire_aura').setOrigin(0.5,1).setScale(2).setDepth(3);
-        this.fire_aura.setBlendMode(Phaser.BlendModes.COLOR);
 
         //load fire animation
         this.bodyFire = scene.add.sprite(this.x, this.y + 6,'body_fire').setOrigin(1,1).setScale(2).setDepth(2);
@@ -30,6 +29,7 @@ class Fire {
     }
 
     update(distance, player, worldView) {
+        this.fire_aura.setBlendMode(Phaser.BlendModes.COLOR);
         this.distance = Phaser.Math.Distance.Between(this.x, 0, worldView.left, 0);
         if(this.distance > this.maxDistFromScreen && this.x < worldView.left) this.x = worldView.left - this.maxDistFromScreen;
         //console.log(this.distance);
