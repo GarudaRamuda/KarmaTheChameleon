@@ -40,13 +40,13 @@ class Fire {
         //console.log(this.velocityX);
         this.updateSprites();
         this.setVolume(this.soundFireClose, 100, 0, worldView);
-        this.setVolume(this.soundFireMed, 215, 100, worldView);
+        this.setVolume(this.soundFireMed, 500, 250, worldView);
     }
 
     updateSprites() {
         //this.debugLine.setPosition(this.x, 0);
         this.bodyFire.setPosition(this.x + 200, this.y+ 6);
-        this.fire_aura.setPosition(this.x - 100, this.y);
+        this.fire_aura.setPosition(this.x + 100, this.y);
     }
 
     clamp(value, min, max) {
