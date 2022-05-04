@@ -135,8 +135,7 @@ class Play extends Phaser.Scene {
             //check if platforms are outside the screen and handle the behavior for that
             this.destroyOffScreen();
             this.parallaxBGs();
-
-            this.matter.world.step(this.matterTimeStep);
+            
             this.okToSpawn();
 
             this.spawnController();
