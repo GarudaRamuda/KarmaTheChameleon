@@ -202,7 +202,7 @@ class Play extends Phaser.Scene {
     spawnNewObject() {
         // let selection = Math.floor(this.getRandomArbitrary(0, this.objectProtos.length));        
         let selection = this.rand75(); // 75% chance of spawning branch
-        console.log("S: ", selection);
+        // console.log("S: ", selection);
         this.scale_dist = this.scaleDifficulty(this.distance);
         // console.log(this.distance + this.scale_dist);
         this.objCoordTracker = this.distance;

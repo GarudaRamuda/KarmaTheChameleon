@@ -48,7 +48,7 @@ class Player extends Phaser.Physics.Matter.Sprite {
 
 
         // Set up player movement params
-        this.groundForce = 0.045;
+        this.groundForce = 0.048;
         this.groundSpeedCap = 0.4; // velocity is hard capped whenever player is grounded
 
         this.grappleForce = .0007;
@@ -87,10 +87,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         // Whenever player is grounded, set lastGrounded to coyoteTime; ticks down every frame, set to 0 by jumping, and jumping is disabled at 0
         this.coyoteTime = 15;
         this.lastGrounded = 0;
-
-        this.ropeJustCreated = false;
-        this.ropeCreatedFrameAgo = false;
-
         // Let player jump even if they press too early before landing
         this.bufferWindow = 16;
         this.jumpBuffer = 0;
@@ -151,16 +147,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
         if (!keySPACE.isDown && this.isGrappled) {
             this.ungrapple();
             this.scene.tongue.detach();
-        }
-
-        if(this.ropeCreatedFrameAgo) {
-            // Use this line as a break point to see the rope segments the frame after their creation
-            this.ropeCreatedFrameAgo = false;
-        }
-
-        if(this.ropeJustCreated) {
-            this.ropeJustCreated = false;
-            this.ropeCreatedFrameAgo = true;
         }
 
         // Rotate
@@ -326,9 +312,6 @@ class Player extends Phaser.Physics.Matter.Sprite {
                     let ropeStep = ropeLength / num_steps;
 
                     let prev;
-
-                    //used to debug rope
-                    this.ropeJustCreated = true;
 
                     // save grapple point
                     this.grapplePointX = body.position.x;
